@@ -4,8 +4,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
+import com.empanada.app.webservice.ui.model.response.UserRest;
 
 @RestController
 @RequestMapping("users") // http://localhost:8080/users
@@ -16,10 +20,9 @@ public class UserController {
 		return "something";
 	}
 	
-	
 	@PostMapping
-	public String createUser () {
-		return "create userhas been used";
+	public UserRest createUser (@RequestBody UserDetailsRequestModel userDetails) {
+		return null;
 	}
 	
 	@PutMapping
