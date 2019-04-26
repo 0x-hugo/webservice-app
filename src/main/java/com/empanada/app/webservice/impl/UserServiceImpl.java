@@ -4,6 +4,7 @@ import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.empanada.app.webservice.UserRepository;
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService{
 	@Autowired
 	Utils utils;
 	
+	@Autowired
+	BCryptPasswordEncoder bCryptPasswordEncoder;
+	
 	@Override
 	public UserDto createUser(UserDto user) {
 		
@@ -33,7 +37,7 @@ public class UserServiceImpl implements UserService{
 		
 		//HardCode for test
 		userEntity.setUserId(utils.generateUserId(30));
-		userEntity.setEncryptedPassword("tesst");
+		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		
 		
 		UserEntity storedUserDetails = userRepository.save(userEntity);
