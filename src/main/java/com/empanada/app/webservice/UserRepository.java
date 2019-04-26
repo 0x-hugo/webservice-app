@@ -11,11 +11,11 @@ import com.empanada.app.webservice.io.entity.UserEntity;
  * 
  * */
 @Repository
-public interface UserReporsitory extends CrudRepository<UserEntity, Long>{
+public interface UserRepository extends CrudRepository<UserEntity, Long>{
 	
 	/**
 	 * It already has create, read, update, delete methods but you can add some more. Beautiful
 	 **/
 	
-	// UserEntity findUserByEmail (String email); //custom method to implement
+	UserEntity findByEmail (String email); //custom method to implement
 }
