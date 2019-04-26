@@ -10,6 +10,7 @@ import com.empanada.app.webservice.UserRepository;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserDto;
+import com.empanada.app.webservice.shared.utils.Utils;
 
 
 @Service
@@ -17,6 +18,9 @@ public class UserServiceImpl implements UserService{
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	Utils utils;
 	
 	@Override
 	public UserDto createUser(UserDto user) {
@@ -28,7 +32,7 @@ public class UserServiceImpl implements UserService{
 		BeanUtils.copyProperties(user, userEntity);
 		
 		//HardCode for test
-		userEntity.setUserId("testUser");
+		userEntity.setUserId(utils.generateUserId(30));
 		userEntity.setEncryptedPassword("tesst");
 		
 		
