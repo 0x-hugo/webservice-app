@@ -26,9 +26,15 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 		.permitAll()
 		.anyRequest()
 		.authenticated()
-		.and().addFilter(new AuthenticationFilter(authenticationManager()));
+		.and()
 		
-		//New AuthenticationFilter set up /login as default login url
+		//New AuthenticationFilter set up /login as default login url. It can also get updated by override getAuthenticationFilter
+		.addFilter(new AuthenticationFilter(authenticationManager()))
+		
+		//Setup tokens using filters
+		.addFilter(new AuthorizationFilter(authenticationManager()));
+		
+
 	}
 	
 	@Override
