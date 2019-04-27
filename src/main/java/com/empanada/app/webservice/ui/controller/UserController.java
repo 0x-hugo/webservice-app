@@ -2,8 +2,10 @@ package com.empanada.app.webservice.ui.controller;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,15 +25,22 @@ public class UserController {
 	UserService userService;
 	
 	
-	@GetMapping
-	public String getUserInformation () {
-		return "something";
+	@GetMapping(path = "/{id}")
+	public UserRest getUserInformation (@PathVariable String id) {
+		UserRest userResponse = new UserRest();
+		
+		UserDto userDto = userService.getUserByUserId(id);
+		if (userDto == null) throw new UsernameNotFoundException(id);
+		
+		BeanUtils.copyProperties(userDto, userResponse);
+		
+		return userResponse;
 	}
 	
 	@PostMapping
 	public UserRest createUser (@RequestBody UserDetailsRequestModel userDetails) {
 		UserRest userResponse = new UserRest();
-		
+		 
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userDetails, userDto);
 		

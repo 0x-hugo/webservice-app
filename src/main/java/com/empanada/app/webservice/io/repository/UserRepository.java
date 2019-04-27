@@ -17,5 +17,7 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>{
 	 * It already has create, read, update, delete methods but you can add some more. Beautiful
 	 **/
 	
-	UserEntity findByEmail (String email); //custom method to implement
+	UserEntity findByEmail (String email); //Spring creates the query by using "findBy" and the column
+
+	UserEntity findByUserId(String userId);
 }
