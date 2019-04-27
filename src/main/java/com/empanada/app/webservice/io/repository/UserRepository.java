@@ -1,4 +1,4 @@
-package com.empanada.app.webservice;
+package com.empanada.app.webservice.io.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
