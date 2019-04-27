@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.empanada.app.webservice.UserRepository;
 import com.empanada.app.webservice.io.entity.UserEntity;
+import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.shared.utils.Utils;
@@ -59,6 +59,18 @@ public class UserServiceImpl implements UserService{
 		
 		//User is a Spring Security BEAN
 		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
+	}
+
+	@Override
+	public UserDto getuser(String email) {
+		
+		UserEntity userDetails = userRepository.findByEmail(email);
+		if (userDetails == null) throw new UsernameNotFoundException(email);
+		
+		UserDto userDtoInformation = new UserDto();
+		BeanUtils.copyProperties(userDetails, userDtoInformation);
+		
+		return userDtoInformation;
 	} 
 
 }
