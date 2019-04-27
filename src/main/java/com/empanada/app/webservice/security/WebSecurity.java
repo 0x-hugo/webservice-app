@@ -27,6 +27,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 		.anyRequest()
 		.authenticated()
 		.and().addFilter(new AuthenticationFilter(authenticationManager()));
+		
+		//New AuthenticationFilter set up /login as default login url
 	}
 	
 	@Override
