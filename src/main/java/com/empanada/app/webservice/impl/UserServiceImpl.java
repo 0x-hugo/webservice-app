@@ -1,9 +1,10 @@
 package com.empanada.app.webservice.impl;
 
-import javax.management.RuntimeErrorException;
+import java.util.ArrayList;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -51,9 +52,13 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		UserEntity userLoginDetails = userRepository.findByEmail(email);
+		
+		if (userLoginDetails == null) throw new UsernameNotFoundException(email);
+		
+		//User is a Spring Security BEAN
+		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
+	} 
 
 }
