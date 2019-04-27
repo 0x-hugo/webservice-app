@@ -36,7 +36,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 		.addFilter(new AuthorizationFilter(authenticationManager()))
 		
 		//Set stateless to avoid potential security issues (and reauth every request)
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); 
 		
 
 	}
