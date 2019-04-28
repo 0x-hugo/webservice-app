@@ -56,13 +56,14 @@ public class UserServiceImpl implements UserService{
 		UserEntity userLoginDetails = userRepository.findByEmail(email);
 		
 		if (userLoginDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
 		
 		//User is a Spring Security BEAN
 		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
 	}
 
 	@Override
-	public UserDto getUserByEmail(String email) {
+	public UserDto getUserByEmail(String email) throws UserServiceException{
 		
 		UserEntity userDetails = userRepository.findByEmail(email);
 		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
@@ -74,7 +75,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDto getUserByUserId(String userId) {
+	public UserDto getUserByUserId(String userId) throws UserServiceException{
 		 UserEntity userDetails = userRepository.findByUserId(userId);
 		 if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		 
@@ -84,8 +85,8 @@ public class UserServiceImpl implements UserService{
 		 return userDtoInformation;
 	}
 	
-	@Override
-	public UserDto updateUser(String userId, UserDto user) {
+	
+	public UserDto updateUser(String userId, UserDto user) throws UserServiceException{
 		UserEntity userDetails = userRepository.findByUserId(userId);
 		//I don't know if this exception is clear enough. Maybe change this in a near future
 		if(userDetails == null) throw new UserServiceException(ErrorMessages.COULD_NOT_UPDATE_RECORD.getErrorMessage());
@@ -99,6 +100,14 @@ public class UserServiceImpl implements UserService{
 		BeanUtils.copyProperties(userDetails, userDto);
 		
 		return userDto;
+	}
+	
+	public void deleteUser(String userId) throws UserServiceException {
+		UserEntity userDetails = userRepository.findByUserId(userId);
+		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		
+		userRepository.delete(userDetails);
+		
 	}
 
 }

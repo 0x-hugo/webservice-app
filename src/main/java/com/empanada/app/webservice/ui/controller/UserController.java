@@ -17,7 +17,8 @@ import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
-import com.empanada.app.webservice.ui.model.response.ErrorMessages;
+import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
+import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.UserRest;
 
 @RestController
@@ -68,8 +69,17 @@ public class UserController {
 		return userResponse;
 	}
 	
-	@DeleteMapping
-	public String deleteUser () {
-		return "delete";
+	@DeleteMapping  ( 	path = "/{id}",
+						produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } )
+	public OperationStatusModel deleteUser (@PathVariable String id) {
+		
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(OperationStatusName.DELETE.name());
+		
+		userService.deleteUser(id);
+		
+		returnValue.setOperationResult(OperationStatusName.SUCCESS.name());
+		
+		return returnValue;
 	}
 }
