@@ -34,8 +34,6 @@ public class UserController {
 		UserRest userResponse = new UserRest();
 		
 		UserDto userDto = userService.getUserByUserId(id);
-		if (userDto == null) throw new UserServiceException(ErrorMessages.AUTHENTICATION_FAILED.getErrorMessage());
-		
 		BeanUtils.copyProperties(userDto, userResponse);
 		
 		return userResponse;
@@ -55,9 +53,19 @@ public class UserController {
 		return userResponse;
 	}
 	
-	@PutMapping
-	public String updateUser () {
-		return "update";
+	@PutMapping ( 	path = "/{id}",
+					consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
+					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } ) 
+	public UserRest updateUser (@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
+		UserRest userResponse = new UserRest();
+		
+		UserDto userDto = new UserDto();
+		BeanUtils.copyProperties(userDetails, userDto);
+		
+		UserDto updateUser = userService.updateUser(id, userDto);
+		BeanUtils.copyProperties(updateUser, userResponse);
+		
+		return userResponse;
 	}
 	
 	@DeleteMapping

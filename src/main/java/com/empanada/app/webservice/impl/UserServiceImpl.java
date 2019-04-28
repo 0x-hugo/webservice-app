@@ -6,7 +6,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,6 @@ public class UserServiceImpl implements UserService{
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(user, userEntity);
 		
-		//HardCode for test
 		userEntity.setUserId(utils.generateUserId(30));
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		
@@ -84,6 +82,23 @@ public class UserServiceImpl implements UserService{
 		 BeanUtils.copyProperties(userDetails, userDtoInformation);
 		 
 		 return userDtoInformation;
-	} 
+	}
+	
+	@Override
+	public UserDto updateUser(String userId, UserDto user) {
+		UserEntity userDetails = userRepository.findByUserId(userId);
+		//I don't know if this exception is clear enough. Maybe change this in a near future
+		if(userDetails == null) throw new UserServiceException(ErrorMessages.COULD_NOT_UPDATE_RECORD.getErrorMessage());
+		
+		//BeanUtils.copyProperties(user, userDetails); This caused issues on identifier instance altered. I decided to use SET as a better alternative
+		userDetails.setFirstName(user.getFirstName());
+		userDetails.setLastName(user.getLastName());
+		userRepository.save(userDetails);
+		
+		UserDto userDto = new UserDto();
+		BeanUtils.copyProperties(userDetails, userDto);
+		
+		return userDto;
+	}
 
 }
