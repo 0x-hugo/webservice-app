@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
+import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 import com.empanada.app.webservice.ui.model.response.UserRest;
 
 @RestController
@@ -29,11 +30,11 @@ public class UserController {
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-	public UserRest getUserInformation (@PathVariable String id) {
+	public UserRest getUserInformation (@PathVariable String id) throws Exception {
 		UserRest userResponse = new UserRest();
 		
 		UserDto userDto = userService.getUserByUserId(id);
-		if (userDto == null) throw new UsernameNotFoundException(id);
+		if (userDto == null) throw new Exception(ErrorMessages.AUTHENTICATION_FAILED.getErrorMessage());
 		
 		BeanUtils.copyProperties(userDto, userResponse);
 		
