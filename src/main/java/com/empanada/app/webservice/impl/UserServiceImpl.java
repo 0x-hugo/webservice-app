@@ -1,9 +1,13 @@
 package com.empanada.app.webservice.impl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,7 +20,6 @@ import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.shared.utils.Utils;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
-
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -85,7 +88,7 @@ public class UserServiceImpl implements UserService{
 		 return userDtoInformation;
 	}
 	
-	
+	@Override
 	public UserDto updateUser(String userId, UserDto user) throws UserServiceException{
 		UserEntity userDetails = userRepository.findByUserId(userId);
 		//I don't know if this exception is clear enough. Maybe change this in a near future
@@ -102,12 +105,33 @@ public class UserServiceImpl implements UserService{
 		return userDto;
 	}
 	
+	@Override
 	public void deleteUser(String userId) throws UserServiceException {
 		UserEntity userDetails = userRepository.findByUserId(userId);
 		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		userRepository.delete(userDetails);
 		
+	}
+
+	@Override
+	public List<UserDto> getUsers(int page, int limit) {
+		
+		List<UserDto> returnValue = new ArrayList<>();
+		
+		PageRequest pageableRequest = PageRequest.of(page, limit);
+		
+		Page<UserEntity> userPage = userRepository.findAll(pageableRequest);
+
+		List<UserEntity> userListDetails = userPage.getContent();
+		
+		for(final UserEntity user : userListDetails) {
+			UserDto userModel = new UserDto();
+			BeanUtils.copyProperties(user, userModel);
+			returnValue.add(userModel);
+		}
+		
+		return returnValue;
 	}
 
 }

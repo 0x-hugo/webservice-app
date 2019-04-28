@@ -1,6 +1,10 @@
 package com.empanada.app.webservice.ui.controller;
 
 
+import java.beans.Beans;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.empanada.app.webservice.exceptions.UserServiceException;
@@ -38,6 +43,24 @@ public class UserController {
 		BeanUtils.copyProperties(userDto, userResponse);
 		
 		return userResponse;
+	}
+	
+	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+	public List<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
+									@RequestParam(value = "limit", defaultValue = "5") int limit){
+		//for confusion (it took me long time to figure out page 0 was the problem) set page 1 as page 0 
+		if (page > 0) page -= 1;
+		
+		List<UserRest> returnValue = new ArrayList<UserRest>();
+		List<UserDto> userList = userService.getUsers(page, limit);
+		
+		for(final UserDto user : userList) {
+			UserRest userModel = new UserRest();
+			BeanUtils.copyProperties(user, userModel);
+			returnValue.add(userModel);
+		}
+		
+		return returnValue;
 	}
 	
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
@@ -69,8 +92,8 @@ public class UserController {
 		return userResponse;
 	}
 	
-	@DeleteMapping  ( 	path = "/{id}",
-						produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } )
+	@DeleteMapping(	path = "/{id}",
+					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } )
 	public OperationStatusModel deleteUser (@PathVariable String id) {
 		
 		OperationStatusModel returnValue = new OperationStatusModel();
