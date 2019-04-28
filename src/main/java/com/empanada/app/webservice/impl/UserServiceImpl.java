@@ -10,11 +10,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.shared.utils.Utils;
+import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 
 
 @Service
@@ -33,7 +35,7 @@ public class UserServiceImpl implements UserService{
 	public UserDto createUser(UserDto user) {
 		
 		//check if email address already exist
-		if (userRepository.findByEmail(user.getEmail()) != null) throw new RuntimeException("The user already exist");
+		if (userRepository.findByEmail(user.getEmail()) != null) throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 		
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(user, userEntity);
@@ -52,10 +54,10 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String email) throws UserServiceException {
 		UserEntity userLoginDetails = userRepository.findByEmail(email);
 		
-		if (userLoginDetails == null) throw new UsernameNotFoundException(email);
+		if (userLoginDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		//User is a Spring Security BEAN
 		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
@@ -65,7 +67,7 @@ public class UserServiceImpl implements UserService{
 	public UserDto getUserByEmail(String email) {
 		
 		UserEntity userDetails = userRepository.findByEmail(email);
-		if (userDetails == null) throw new UsernameNotFoundException(email);
+		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		UserDto userDtoInformation = new UserDto();
 		BeanUtils.copyProperties(userDetails, userDtoInformation);
@@ -76,7 +78,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public UserDto getUserByUserId(String userId) {
 		 UserEntity userDetails = userRepository.findByUserId(userId);
-		 if (userDetails == null) throw new UsernameNotFoundException(userId);
+		 if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		 
 		 UserDto userDtoInformation = new UserDto();
 		 BeanUtils.copyProperties(userDetails, userDtoInformation);
