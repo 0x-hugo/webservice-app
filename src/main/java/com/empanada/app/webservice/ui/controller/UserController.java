@@ -4,7 +4,6 @@ package com.empanada.app.webservice.ui.controller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
+import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 import com.empanada.app.webservice.ui.model.response.UserRest;
 
 @RestController
@@ -29,11 +30,11 @@ public class UserController {
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-	public UserRest getUserInformation (@PathVariable String id) {
+	public UserRest getUserInformation (@PathVariable String id) throws UserServiceException {
 		UserRest userResponse = new UserRest();
 		
 		UserDto userDto = userService.getUserByUserId(id);
-		if (userDto == null) throw new UsernameNotFoundException(id);
+		if (userDto == null) throw new UserServiceException(ErrorMessages.AUTHENTICATION_FAILED.getErrorMessage());
 		
 		BeanUtils.copyProperties(userDto, userResponse);
 		
