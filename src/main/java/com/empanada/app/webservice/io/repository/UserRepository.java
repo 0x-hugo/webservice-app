@@ -1,6 +1,9 @@
 package com.empanada.app.webservice.io.repository;
 
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import com.empanada.app.webservice.io.entity.UserEntity;
@@ -11,7 +14,7 @@ import com.empanada.app.webservice.io.entity.UserEntity;
  * 
  * */
 @Repository
-public interface UserRepository extends CrudRepository<UserEntity, Long>{
+public interface UserRepository extends PagingAndSortingRepository<UserEntity, Long>{
 	
 	/**
 	 * It already has create, read, update, delete methods but you can add some more. Beautiful
@@ -20,4 +23,5 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>{
 	UserEntity findByEmail (String email); //Spring creates the query by using "findBy" and the column
 
 	UserEntity findByUserId(String userId);
+	
 }
