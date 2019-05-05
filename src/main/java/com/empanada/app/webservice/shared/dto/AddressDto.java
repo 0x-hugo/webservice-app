@@ -7,6 +7,8 @@ public class AddressDto {
 	private String country;
 	private String streetName;
 	private String postalCode;
+	
+	// It's supossed to get some information from the user who has that address (not sure about the impl) TODO
 	private UserDto userDetails;
 	
 	public long getId() {
