@@ -3,6 +3,7 @@ package com.empanada.app.webservice.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
@@ -17,6 +18,7 @@ import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.UserService;
+import com.empanada.app.webservice.shared.dto.AddressDto;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.shared.utils.Utils;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
@@ -39,17 +41,29 @@ public class UserServiceImpl implements UserService{
 		//check if email address already exist
 		if (userRepository.findByEmail(user.getEmail()) != null) throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 		
-		UserEntity userEntity = new UserEntity();
-		BeanUtils.copyProperties(user, userEntity);
+		for (int i = 0; i < user.getAddresses().size(); i++) {
+			AddressDto address = user.getAddresses().get(i);
+			
+			//Implementing UserDetails inside address 
+			address.setUserDetails(user);
+			address.setAddressId(utils.generateAddressId(30));
+			user.getAddresses().set(i, address);
+		}
 		
-		userEntity.setUserId(utils.generateUserId(30));
+		ModelMapper modelMapper = new ModelMapper();
+		UserEntity userEntity = new UserEntity();
+		//BeanUtils.copyProperties(user, userEntity);
+		modelMapper.map(user, userEntity);
+		
+		userEntity.setUserId(utils.generateUserId(30)); 
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		
 		
 		UserEntity storedUserDetails = userRepository.save(userEntity);
 		
 		UserDto userDtoCreationDetails = new UserDto();
-		BeanUtils.copyProperties(storedUserDetails, userDtoCreationDetails);
+		//BeanUtils.copyProperties(storedUserDetails, userDtoCreationDetails);
+		modelMapper.map(storedUserDetails, userDtoCreationDetails);
 		
 		return userDtoCreationDetails;
 	}
