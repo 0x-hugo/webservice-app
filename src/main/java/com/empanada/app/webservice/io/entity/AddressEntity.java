@@ -40,8 +40,25 @@ public class AddressEntity implements Serializable {
 	@Column(nullable = false, length = 10)
 	private String postalCode;
 	
+	@ManyToOne
 	@JoinColumn(name="addresses")
-	private UserDto userDetails;
+	private UserEntity userDetails;
+
+	public String getAddressId() {
+		return addressId;
+	}
+
+	public void setAddressId(String addressId) {
+		this.addressId = addressId;
+	}
+
+	public UserEntity getUserDetails() {
+		return userDetails;
+	}
+
+	public void setUserDetails(UserEntity userDetails) {
+		this.userDetails = userDetails;
+	}
 
 	public long getId() {
 		return id;
