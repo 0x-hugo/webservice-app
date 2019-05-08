@@ -67,6 +67,7 @@ public class UserController {
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } ) 
 	public UserRest createUser (@RequestBody UserDetailsRequestModel userDetails) {
+		//It needs to return an object with addresses
 		UserRest userResponse = new UserRest();
 		 
 		//UserDto userDto = new UserDto();
@@ -76,7 +77,7 @@ public class UserController {
 		
 		UserDto createdUser = userService.createUser(userDto);
 		//BeanUtils.copyProperties(createdUser, userResponse);
-		modelMapper.map(createdUser, UserRest.class);
+		userResponse = modelMapper.map(createdUser, UserRest.class);
 		
 		return userResponse;
 	}
