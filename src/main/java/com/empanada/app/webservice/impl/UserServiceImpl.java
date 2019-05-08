@@ -40,6 +40,13 @@ public class UserServiceImpl implements UserService{
 		
 		//check if email address already exist
 		if (userRepository.findByEmail(user.getEmail()) != null) throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
+
+
+		ModelMapper modelMapper = new ModelMapper();
+		//BeanUtils.copyProperties(user, userEntity);
+		UserEntity userEntity = modelMapper.map(user, UserEntity.class);
+		userEntity.setUserId(utils.generateUserId(30)); 
+		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		
 		for (int i = 0; i < user.getAddresses().size(); i++) {
 			AddressDto address = user.getAddresses().get(i);
@@ -50,14 +57,7 @@ public class UserServiceImpl implements UserService{
 			user.getAddresses().set(i, address);
 		}
 		
-		ModelMapper modelMapper = new ModelMapper();
-		UserEntity userEntity = new UserEntity();
-		//BeanUtils.copyProperties(user, userEntity);
-		modelMapper.map(user, userEntity);
-		
-		userEntity.setUserId(utils.generateUserId(30)); 
-		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		
+
 		
 		UserEntity storedUserDetails = userRepository.save(userEntity);
 		

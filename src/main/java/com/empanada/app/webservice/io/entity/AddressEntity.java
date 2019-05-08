@@ -2,6 +2,7 @@ package com.empanada.app.webservice.io.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,7 +41,7 @@ public class AddressEntity implements Serializable {
 	@Column(nullable = false, length = 10)
 	private String postalCode;
 	
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
 	@JoinColumn(name="addresses")
 	private UserEntity userDetails;
 
