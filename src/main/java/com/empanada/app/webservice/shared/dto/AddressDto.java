@@ -3,6 +3,7 @@ package com.empanada.app.webservice.shared.dto;
 public class AddressDto {
 	
 	private long id;
+	private long addressId;
 	private String city;
 	private String country;
 	private String streetName;
@@ -46,5 +47,11 @@ public class AddressDto {
 	}
 	public void setUserDetails(UserDto userDetails) {
 		this.userDetails = userDetails;
+	}
+	public long getAddressId() {
+		return addressId;
+	}
+	public void setAddressId(long addressId) {
+		this.addressId = addressId;
 	}
 }
