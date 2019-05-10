@@ -26,7 +26,7 @@ public class AddressEntity implements Serializable {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
 	
-	@Column(nullable = false, length = 30)
+	@Column(nullable = false)
 	private String addressId;
 
 	@Column(nullable = false, length = 100)
