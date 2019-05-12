@@ -1,22 +1,14 @@
-package com.empanada.app.webservice.shared.dto;
+package com.empanada.app.webservice.ui.model.response;
 
-public class AddressDto {
-	
-	private long id;
+public class AddressRest {
+
 	private String addressId;
 	private String city;
 	private String country;
 	private String streetName;
 	private String postalCode;
-	// It's supossed to get some information from the user who has that address (not sure about the impl) TODO
-	private UserDto userDetails;
 	
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
-	}
+	
 	public String getCity() {
 		return city;
 	}
@@ -41,16 +33,12 @@ public class AddressDto {
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
 	}
-	public UserDto getUserDetails() {
-		return userDetails;
-	}
-	public void setUserDetails(UserDto userDetails) {
-		this.userDetails = userDetails;
-	}
 	public String getAddressId() {
 		return addressId;
 	}
 	public void setAddressId(String addressId) {
 		this.addressId = addressId;
 	}
+	
+	
 }
