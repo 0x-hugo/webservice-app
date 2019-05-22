@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,8 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.service.UserService;
+import com.empanada.app.webservice.shared.dto.AddressDto;
 import com.empanada.app.webservice.shared.dto.UserDto;
 import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
+import com.empanada.app.webservice.ui.model.response.AddressRest;
 import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.UserRest;
@@ -39,9 +42,11 @@ public class UserController {
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 	public UserRest getUserInformation (@PathVariable String id) throws UserServiceException {
 		UserRest userResponse = new UserRest();
+		ModelMapper modelMapper = new ModelMapper();
 		
 		UserDto userDto = userService.getUserByUserId(id);
-		BeanUtils.copyProperties(userDto, userResponse);
+//		BeanUtils.copyProperties(userDto, userResponse); it returns stackoverflow otherwise
+		userResponse = modelMapper.map(userDto, UserRest.class);
 		
 		return userResponse;
 	}
@@ -110,4 +115,25 @@ public class UserController {
 		
 		return returnValue;
 	}
+	
+	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
+	@GetMapping (	path = "/{id}/addresses",
+				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+		public List<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
+		
+		List<AddressRest> returnValue = new ArrayList<>();
+		List<AddressDto> AddressDto = new ArrayList<>();
+		ModelMapper modelMapper = new ModelMapper();
+		
+		AddressDto = userService.getUserByUserId(id).getAddresses();
+		
+		java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+		
+		returnValue = modelMapper.map(AddressDto, listType);
+		
+		//BeanUtils.copyProperties(AddressDto, addressResponse);
+		
+		return returnValue;
+}
+	
 }
