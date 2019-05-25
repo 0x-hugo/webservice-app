@@ -56,7 +56,7 @@ public class UserController {
 	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 	public List<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
 									@RequestParam(value = "limit", defaultValue = "5") int limit){
-		//for confusion (it took me long time to figure out page 0 was the problem) set page 1 as page 0 
+		//for confusion (it took me long time to figure out page 0 was the problem) set page 1 as page 0
 		if (page > 0) page -= 1;
 		
 		List<UserRest> returnValue = new ArrayList<UserRest>();
@@ -64,7 +64,8 @@ public class UserController {
 		
 		for(final UserDto user : userList) {
 			UserRest userModel = new UserRest();
-			BeanUtils.copyProperties(user, userModel);
+			userModel = new ModelMapper().map(user, UserRest.class);
+			//BeanUtils.copyProperties(user, userModel);
 			returnValue.add(userModel);
 		}
 		
