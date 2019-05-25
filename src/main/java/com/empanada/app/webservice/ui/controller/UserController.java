@@ -1,7 +1,6 @@
 package com.empanada.app.webservice.ui.controller;
 
 
-import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,7 +125,8 @@ public class UserController {
 		ModelMapper modelMapper = new ModelMapper();
 		
 		AddressDto = userService.getUserByUserId(id).getAddresses();
-		
+
+		//this is for mapping lists. 
 		java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
 		
 		returnValue = modelMapper.map(AddressDto, listType);

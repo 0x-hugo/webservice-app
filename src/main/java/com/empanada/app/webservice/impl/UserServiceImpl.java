@@ -6,7 +6,6 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.User;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
+import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.AddressDto;
 import com.empanada.app.webservice.shared.dto.UserDto;
@@ -34,6 +34,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	AddressService addressService;
 	
 	@Override
 	public UserDto createUser(UserDto user) {
