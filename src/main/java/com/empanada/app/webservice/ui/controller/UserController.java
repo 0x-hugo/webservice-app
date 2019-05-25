@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.empanada.app.webservice.exceptions.UserServiceException;
+import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.AddressDto;
 import com.empanada.app.webservice.shared.dto.UserDto;
@@ -36,6 +37,8 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	
+	@Autowired
+	AddressService addressService;
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
@@ -135,6 +138,18 @@ public class UserController {
 		//BeanUtils.copyProperties(AddressDto, addressResponse);
 		
 		return returnValue;
-}
+	}
 	
+	@GetMapping (	path = "/{userId}/addresses/{addressId}",
+					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+		public AddressRest getAddressInformation (@PathVariable String addressId) {
+		AddressRest addressResponse = new AddressRest();
+		
+		AddressDto addressDto = addressService.getAddressByAddressId(addressId);
+		addressResponse = new ModelMapper().map(addressDto, AddressRest.class); 
+		
+		
+		return addressResponse;
+	}
+
 }
