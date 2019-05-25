@@ -1,7 +1,6 @@
 package com.empanada.app.webservice.ui.controller;
 
 
-import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,6 +115,7 @@ public class UserController {
 		return returnValue;
 	}
 	
+	//if more functionalities added, I will create it's own controller
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
 				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
@@ -126,7 +126,8 @@ public class UserController {
 		ModelMapper modelMapper = new ModelMapper();
 		
 		AddressDto = userService.getUserByUserId(id).getAddresses();
-		
+
+		//this is for mapping lists. 
 		java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
 		
 		returnValue = modelMapper.map(AddressDto, listType);
