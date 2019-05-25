@@ -115,6 +115,7 @@ public class UserController {
 		return returnValue;
 	}
 	
+	//if more functionalities added, I will create it's own controller
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
 				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
