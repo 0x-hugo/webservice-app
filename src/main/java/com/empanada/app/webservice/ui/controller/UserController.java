@@ -9,6 +9,8 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +36,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("users") // http://localhost:8080/users
+@RequestMapping("/users") // http://localhost:8080/users
 public class UserController {
 	
 	@Autowired
@@ -44,7 +46,7 @@ public class UserController {
 	AddressService addressService;
 	
 	@GetMapping (	path = "/{id}",
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
 	public UserRest getUserInformation (@PathVariable String id) throws UserServiceException {
 		UserRest userResponse = new UserRest();
 		ModelMapper modelMapper = new ModelMapper();
@@ -122,11 +124,12 @@ public class UserController {
 		return returnValue;
 	}
 	
+	
 	//if more functionalities added, I will create it's own controller
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
-				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-		public List<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
+				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+		public Resources<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
 		
 		List<AddressRest> addressesResponse = new ArrayList<>();
 		List<AddressDto> addressDto = new ArrayList<>();
@@ -152,12 +155,12 @@ public class UserController {
 		
 		//BeanUtils.copyProperties(AddressDto, addressResponse);
 		
-		return addressesResponse;
+		return new Resources<>(addressesResponse);
 	}
 	
 	@GetMapping (	path = "/{userId}/addresses/{addressId}",
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-		public AddressRest getAddressInformation (	@PathVariable String userId,
+					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+		public Resource<AddressRest>getAddressInformation (	@PathVariable String userId,
 													@PathVariable String addressId) {
 		AddressRest addressResponse = new AddressRest();
 		//link al mismo controller
@@ -172,7 +175,7 @@ public class UserController {
 		addressResponse.add(linkAddresses);
 		addressResponse.add(linkUser);
 		
-		return addressResponse;
+		return new Resource<>(addressResponse);
 	}
 
 }
