@@ -31,6 +31,7 @@ import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.UserRest;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("users") // http://localhost:8080/users
@@ -149,13 +150,15 @@ public class UserController {
 													@PathVariable String addressId) {
 		AddressRest addressResponse = new AddressRest();
 		//link al mismo controller
-		Link linkAddress = linkTo(UserController.class).slash(userId).slash("addresses").slash(addressId).withSelfRel();
+		Link linkSelf = linkTo(methodOn(UserController.class).getAddressInformation(userId, addressId)).withSelfRel();
 		Link linkUser = linkTo(UserController.class).slash(userId).withRel("user");
+		Link linkAddresses = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
 		
 		AddressDto addressDto = addressService.getAddressByAddressId(addressId);
 		addressResponse = new ModelMapper().map(addressDto, AddressRest.class); 
 		
-		addressResponse.add(linkAddress);
+		addressResponse.add(linkSelf);
+		addressResponse.add(linkAddresses);
 		addressResponse.add(linkUser);
 		
 		return addressResponse;
