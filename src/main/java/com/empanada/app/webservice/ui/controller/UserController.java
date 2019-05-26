@@ -47,34 +47,52 @@ public class UserController {
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public UserRest getUserInformation (@PathVariable String id) throws UserServiceException {
+	public Resource<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
 		UserRest userResponse = new UserRest();
 		ModelMapper modelMapper = new ModelMapper();
 		
 		UserDto userDto = userService.getUserByUserId(id);
+		//Link userLink = linkTo(methodOn(UserController.class).).withSelfRel();
 //		BeanUtils.copyProperties(userDto, userResponse); it returns stackoverflow otherwise
+		
 		userResponse = modelMapper.map(userDto, UserRest.class);
 		
-		return userResponse;
+		for (AddressRest address : userResponse.getAddresses()) {
+			Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId())).withRel("address");
+			address.add(addressLink);
+		}
+		
+		return new Resource<>(userResponse);
 	}
 	
-	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-	public List<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
-									@RequestParam(value = "limit", defaultValue = "5") int limit){
+	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+	public Resources<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
+											@RequestParam(value = "limit", defaultValue = "5") int limit){
 		//for confusion (it took me long time to figure out page 0 was the problem) set page 1 as page 0
 		if (page > 0) page -= 1;
 		
 		List<UserRest> returnValue = new ArrayList<UserRest>();
 		List<UserDto> userList = userService.getUsers(page, limit);
 		
-		for(final UserDto user : userList) {
-			UserRest userModel = new UserRest();
-			userModel = new ModelMapper().map(user, UserRest.class);
-			//BeanUtils.copyProperties(user, userModel);
-			returnValue.add(userModel);
+		if(userList != null && !userList.isEmpty()) {
+			for(final UserDto user : userList) {
+				UserRest userModel = new UserRest();
+				
+				//TODO: Look if links can be positioned on the json response
+				Link userLink = linkTo(methodOn(UserController.class).getUserInformation(userModel.getUserId())).withRel("user");
+				userModel.add(userLink);
+				userModel = new ModelMapper().map(user, UserRest.class);
+				
+				
+				for (AddressRest address : userModel.getAddresses()) {
+					Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(userModel.getUserId(), address.getAddressId())).withRel("address");
+					address.add(addressLink);
+				}
+				returnValue.add(userModel);
+			}
 		}
-		
-		return returnValue;
+			
+		return new Resources<>(returnValue);
 	}
 	
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },

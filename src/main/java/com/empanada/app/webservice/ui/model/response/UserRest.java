@@ -2,9 +2,11 @@ package com.empanada.app.webservice.ui.model.response;
 
 import java.util.List;
 
+import org.springframework.hateoas.ResourceSupport;
+
 import com.empanada.app.webservice.io.entity.AddressEntity;
 
-public class UserRest {
+public class UserRest extends ResourceSupport{
 	
 	//public user id
 	private String userId;
