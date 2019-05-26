@@ -128,20 +128,31 @@ public class UserController {
 				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 		public List<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
 		
-		List<AddressRest> returnValue = new ArrayList<>();
-		List<AddressDto> AddressDto = new ArrayList<>();
+		List<AddressRest> addressesResponse = new ArrayList<>();
+		List<AddressDto> addressDto = new ArrayList<>();
 		ModelMapper modelMapper = new ModelMapper();
 		
-		AddressDto = userService.getUserByUserId(id).getAddresses();
-
-		//this is for mapping lists. 
-		java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+		addressDto = addressService.getAddresses(id);
 		
-		returnValue = modelMapper.map(AddressDto, listType);
+		if(addressDto != null && !addressDto.isEmpty()) {
+			//this is for mapping lists. 
+			java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+			addressesResponse = modelMapper.map(addressDto, listType);
+			
+			for (AddressRest address: addressesResponse) {
+				Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId())).withRel("address");
+				address.add(addressLink);
+				
+				Link userLink = linkTo(methodOn(UserController.class).getUserInformation(id)).withRel("user");
+				address.add(userLink);
+			}
+		}
+		
+		
 		
 		//BeanUtils.copyProperties(AddressDto, addressResponse);
 		
-		return returnValue;
+		return addressesResponse;
 	}
 	
 	@GetMapping (	path = "/{userId}/addresses/{addressId}",
