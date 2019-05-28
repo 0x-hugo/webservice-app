@@ -151,4 +151,25 @@ public class UserServiceImpl implements UserService{
 		return returnValue;
 	}
 
+	// I will add a new token on the user so it can match with the one in db. 
+	// after that, null the field so you can't verify it twice
+	@Override
+	public boolean verifyEmailToken(String token) {
+		boolean returnValue = false; 
+		
+		UserEntity userEntity = userRepository.findUserByEmailVerification(token);
+		
+		if(userEntity == null) {
+			boolean hasTokenExpired = Utils.hasTokenExpired(token);
+			if(!hasTokenExpired) {
+				userEntity.setEmailVerificationToken(null);
+				userEntity.setEmailVerficationStatus(Boolean.TRUE);
+				userRepository.save(userEntity);
+				returnValue = true;
+			}
+		}
+		
+		return returnValue;
+	}
+
 }
