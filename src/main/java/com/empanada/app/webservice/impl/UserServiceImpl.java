@@ -18,9 +18,9 @@ import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
+import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.AddressDto;
 import com.empanada.app.webservice.shared.dto.UserDto;
-import com.empanada.app.webservice.shared.utils.Utils;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 
 @Service

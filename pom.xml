@@ -80,6 +80,7 @@
 
 
 	<build>
+		<finalName>confirmation-email</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

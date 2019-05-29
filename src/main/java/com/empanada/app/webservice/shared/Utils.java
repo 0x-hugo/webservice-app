@@ -1,4 +1,4 @@
-package com.empanada.app.webservice.shared.utils;
+package com.empanada.app.webservice.shared;
 
 import java.security.SecureRandom;
 import java.util.Date;
