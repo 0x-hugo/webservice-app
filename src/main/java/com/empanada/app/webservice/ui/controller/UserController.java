@@ -1,6 +1,9 @@
 package com.empanada.app.webservice.ui.controller;
 
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +34,8 @@ import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
 import com.empanada.app.webservice.ui.model.response.AddressRest;
 import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
+import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/users") // http://localhost:8080/users
@@ -137,7 +139,8 @@ public class UserController {
 		
 		userService.deleteUser(id);
 		
-		returnValue.setOperationResult(OperationStatusName.SUCCESS.name());
+		//TODO: to review
+		returnValue.setOperationResult(OperationStatusResult.SUCCESS.name());
 		
 		return returnValue;
 	}
@@ -195,5 +198,27 @@ public class UserController {
 		
 		return new Resource<>(addressResponse);
 	}
+	
+	/*
+	 * http://localhost:8080/spring-ws-app/users/email-verification?token=jkld1kl3
+	 * */
+	@GetMapping (path = "/email-verification", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public OperationStatusModel verifyEmailToken (@RequestParam(value = "token") String token) {
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(OperationStatusName.VERIFY_EMAIL.name());
+		
+		boolean isVerified = userService.verifyEmailToken(token);
+		if (isVerified) {
+			returnValue.setOperationResult(OperationStatusResult.SUCCESS.name());
+		}else {
+			returnValue.setOperationResult(OperationStatusResult.ERROR.name());
+		}
+		
+		return returnValue;
+	}
 
+	
+	
+	
+	
 }

@@ -23,16 +23,18 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 	 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception { 
-		http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
+		http.csrf().disable().authorizeRequests()
+		.antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
+		.permitAll()
+		.antMatchers(HttpMethod.GET, SecurityConstants.EMAIL_VERIFICATION_URL)
 		.permitAll()
 		.anyRequest()
 		.authenticated()
 		.and()
-		
 		//New AuthenticationFilter set up /login as default login url. It can also get updated by override getAuthenticationFilter
 		.addFilter(new AuthenticationFilter(authenticationManager()))
 		
-		//Setup tokens using filters
+		//TODO: Setup tokens using filters
 		.addFilter(new AuthorizationFilter(authenticationManager()))
 		
 		//Set stateless to avoid potential security issues (and reauth every request)

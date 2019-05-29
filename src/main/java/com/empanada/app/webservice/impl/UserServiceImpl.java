@@ -55,9 +55,10 @@ public class UserServiceImpl implements UserService{
 		ModelMapper modelMapper = new ModelMapper();
 		//BeanUtils.copyProperties(user, userEntity);
 		UserEntity userEntity = modelMapper.map(user, UserEntity.class);
-		userEntity.setUserId(utils.generateUserId(30)); 
+		String publicUserId = utils.generateUserId(30);
+		userEntity.setUserId(publicUserId); 
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		
+		userEntity.setEmailVerificationToken(Utils.generateVerificationToken(publicUserId));
 		
 		
 
@@ -77,9 +78,12 @@ public class UserServiceImpl implements UserService{
 		
 		if (userLoginDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-		
 		//User is a Spring Security BEAN
-		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
+		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(),
+						userLoginDetails.getEmailVerficationStatus(),
+						true, true, true, new ArrayList<>());
+		
+//		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
 	}
 
 	@Override
@@ -146,6 +150,27 @@ public class UserServiceImpl implements UserService{
 			UserDto userModel = new UserDto();
 			BeanUtils.copyProperties(user, userModel);
 			returnValue.add(userModel);
+		}
+		
+		return returnValue;
+	}
+
+	// I will add a new token on the user so it can match with the one in db. 
+	// after that, null the field so you can't verify it twice
+	@Override
+	public boolean verifyEmailToken(String token) {
+		boolean returnValue = false; 
+		
+		UserEntity userEntity = userRepository.findUserByEmailVerification(token);
+		
+		if(userEntity == null) {
+			boolean hasTokenExpired = Utils.hasTokenExpired(token);
+			if(!hasTokenExpired) {
+				userEntity.setEmailVerificationToken(null);
+				userEntity.setEmailVerficationStatus(Boolean.TRUE);
+				userRepository.save(userEntity);
+				returnValue = true;
+			}
 		}
 		
 		return returnValue;
