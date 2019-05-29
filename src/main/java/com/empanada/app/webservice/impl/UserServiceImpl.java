@@ -55,9 +55,10 @@ public class UserServiceImpl implements UserService{
 		ModelMapper modelMapper = new ModelMapper();
 		//BeanUtils.copyProperties(user, userEntity);
 		UserEntity userEntity = modelMapper.map(user, UserEntity.class);
-		userEntity.setUserId(utils.generateUserId(30)); 
+		String publicUserId = utils.generateUserId(30);
+		userEntity.setUserId(publicUserId); 
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		
+		userEntity.setEmailVerificationToken(Utils.generateVerificationToken(publicUserId));
 		
 		
 
@@ -77,9 +78,12 @@ public class UserServiceImpl implements UserService{
 		
 		if (userLoginDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-		
 		//User is a Spring Security BEAN
-		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
+		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(),
+						userLoginDetails.getEmailVerficationStatus(),
+						true, true, true, new ArrayList<>());
+		
+//		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
 	}
 
 	@Override
