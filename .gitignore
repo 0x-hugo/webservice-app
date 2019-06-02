@@ -1,6 +1,12 @@
 HELP.md
 /target/
+<<<<<<< HEAD
 !.mvn/wrapper/maven-wrapper.jar
+=======
+/bin/
+!.mvn/wrapper/maven-wrapper.jar
+/bin/
+>>>>>>> RELEASE-0.1
 
 ### STS ###
 .apt_generated

@@ -18,6 +18,7 @@ import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
+import com.empanada.app.webservice.shared.AmazonSES;
 import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.AddressDto;
 import com.empanada.app.webservice.shared.dto.UserDto;
@@ -59,15 +60,13 @@ public class UserServiceImpl implements UserService{
 		userEntity.setUserId(publicUserId); 
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		userEntity.setEmailVerificationToken(Utils.generateVerificationToken(publicUserId));
-		
-		
-
-		
+				
 		UserEntity storedUserDetails = userRepository.save(userEntity);
 		
-		UserDto userDtoCreationDetails = new UserDto();
-		//BeanUtils.copyProperties(storedUserDetails, userDtoCreationDetails);
-		modelMapper.map(storedUserDetails, userDtoCreationDetails);
+		UserDto userDtoCreationDetails = modelMapper.map(storedUserDetails, UserDto.class);
+
+		new AmazonSES().verifyEmail(userDtoCreationDetails);
+		
 		
 		return userDtoCreationDetails;
 	}

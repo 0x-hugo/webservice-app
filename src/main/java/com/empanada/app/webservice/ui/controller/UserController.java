@@ -122,10 +122,12 @@ public class UserController {
 		UserRest userResponse = new UserRest();
 		
 		UserDto userDto = new UserDto();
-		BeanUtils.copyProperties(userDetails, userDto);
+		userDto = new ModelMapper().map(userDetails, UserDto.class);
+		
 		
 		UserDto updateUser = userService.updateUser(id, userDto);
-		BeanUtils.copyProperties(updateUser, userResponse);
+		userResponse = new ModelMapper().map(updateUser, UserRest.class);
+//		BeanUtils.copyProperties(updateUser, userResponse);
 		
 		return userResponse;
 	}
