@@ -4,21 +4,21 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import com.empanada.app.webservice.shared.dto.UserDto;
+import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 
 public interface UserService extends UserDetailsService {
 
-	UserDto createUser (UserDto user);
+	UserBasicInformationDTO createUser (UserBasicInformationDTO user);
 	
-	UserDto getUserByEmail (String email);
+	UserBasicInformationDTO getUserByEmail (String email);
 	
-	UserDto getUserByUserId (String UserId);
+	UserBasicInformationDTO getUserByUserId (String UserId);
 	
-	UserDto updateUser (String userId, UserDto user);
+	UserBasicInformationDTO updateUser (String userId, UserBasicInformationDTO user);
 	
 	void deleteUser (String userId);
 
-	List<UserDto> getUsers(int page, int value);
+	List<UserBasicInformationDTO> getUsers(int page, int value);
 
 	boolean verifyEmailToken(String token);
 }

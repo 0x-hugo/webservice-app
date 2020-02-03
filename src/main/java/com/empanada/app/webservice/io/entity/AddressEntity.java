@@ -10,9 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import com.empanada.app.webservice.shared.dto.UserDto;
 
 @Entity(name="address")
 public class AddressEntity implements Serializable {

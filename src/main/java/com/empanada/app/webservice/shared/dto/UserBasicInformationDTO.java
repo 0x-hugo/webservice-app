@@ -3,9 +3,8 @@ package com.empanada.app.webservice.shared.dto;
 import java.io.Serializable;
 import java.util.List;
 
-public class UserDto implements Serializable{
+public class UserBasicInformationDTO implements Serializable{
 
-	//bc of dto
 	private static final long serialVersionUID = 1L;
 	//db id
 	private long id;
@@ -18,7 +17,7 @@ public class UserDto implements Serializable{
 	private String encryptedPassword;
 	private String emailVerificationToken;
 	private Boolean emailverificationStatus = false;
-	private List<AddressDto> addresses;
+	private List<UserAdressDTO> addresses;
 	public long getId() {
 		return id;
 	}
@@ -73,10 +72,10 @@ public class UserDto implements Serializable{
 	public void setEmailverificationStatus(Boolean emailverificationStatus) {
 		this.emailverificationStatus = emailverificationStatus;
 	}
-	public List<AddressDto> getAddresses() {
+	public List<UserAdressDTO> getAddresses() {
 		return addresses;
 	}
-	public void setAddresses(List<AddressDto> addresses) {
+	public void setAddresses(List<UserAdressDTO> addresses) {
 		this.addresses = addresses;
 	}
 	

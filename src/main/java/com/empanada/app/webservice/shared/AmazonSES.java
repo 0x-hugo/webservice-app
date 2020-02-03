@@ -10,7 +10,7 @@ import com.amazonaws.services.simpleemail.model.Content;
 import com.amazonaws.services.simpleemail.model.Destination;
 import com.amazonaws.services.simpleemail.model.Message;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
-import com.empanada.app.webservice.shared.dto.UserDto;
+import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 
 
 @Service
@@ -38,7 +38,7 @@ public class AmazonSES {
 			+ " Thank you! And we are waiting for you inside!";
 
 
-	public void verifyEmail(UserDto userDto) {
+	public void verifyEmail(UserBasicInformationDTO userDto) {
 		
 		//It should consume keys from ~/.aws/ so it wont work if you haven't them 
 		AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard().withRegion(Regions.US_WEST_2)

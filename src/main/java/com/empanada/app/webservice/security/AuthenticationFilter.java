@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.empanada.app.webservice.SpringApplicationContext;
 import com.empanada.app.webservice.service.UserService;
-import com.empanada.app.webservice.shared.dto.UserDto;
+import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.request.UserLoginRequestModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -63,7 +63,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 				.compact();
 		
 		UserService userService = (UserService) SpringApplicationContext.getBean("userServiceImpl");
-		UserDto userDto = userService.getUserByEmail(userName);
+		UserBasicInformationDTO userDto = userService.getUserByEmail(userName);
 		
 		response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
 		response.addHeader("userId", userDto.getUserId());

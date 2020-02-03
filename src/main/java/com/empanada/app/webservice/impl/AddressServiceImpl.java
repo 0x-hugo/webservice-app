@@ -13,7 +13,7 @@ import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.AddressRepository;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.AddressService;
-import com.empanada.app.webservice.shared.dto.AddressDto;
+import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -25,8 +25,8 @@ public class AddressServiceImpl implements AddressService {
 	AddressRepository addressRepository;
 	
 	@Override
-	public List<AddressDto> getAddresses(String userId) {
-		List<AddressDto> returnValue = new ArrayList<AddressDto>();
+	public List<UserAdressDTO> getAddresses(String userId) {
+		List<UserAdressDTO> returnValue = new ArrayList<UserAdressDTO>();
 		ModelMapper modelMapper = new ModelMapper();
 		
 		//Because of public id, I cannot get the userDatabaseId and request db. I need, first, the object. 
@@ -35,7 +35,7 @@ public class AddressServiceImpl implements AddressService {
 		
 		Iterable<AddressEntity> addresses = addressRepository.findAllByUserDetails(userEntity);
 		for (AddressEntity addressEntity : addresses) {
-			returnValue.add( modelMapper.map(addressEntity,AddressDto.class));
+			returnValue.add( modelMapper.map(addressEntity,UserAdressDTO.class));
 		}
 		
 
@@ -43,12 +43,12 @@ public class AddressServiceImpl implements AddressService {
 	}
 
 	@Override
-	public AddressDto getAddressByAddressId(String addressId) {
-		AddressDto returnValue = null;
+	public UserAdressDTO getAddressByAddressId(String addressId) {
+		UserAdressDTO returnValue = null;
 		AddressEntity addressEntity = addressRepository.findByAddressId(addressId);
 		
 		if (addressEntity != null)
-			returnValue = new ModelMapper().map(addressEntity, AddressDto.class);
+			returnValue = new ModelMapper().map(addressEntity, UserAdressDTO.class);
 		
 		return returnValue;
 	}

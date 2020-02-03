@@ -20,8 +20,8 @@ import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.AmazonSES;
 import com.empanada.app.webservice.shared.Utils;
-import com.empanada.app.webservice.shared.dto.AddressDto;
-import com.empanada.app.webservice.shared.dto.UserDto;
+import com.empanada.app.webservice.shared.dto.UserAdressDTO;
+import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 
 @Service
@@ -40,16 +40,14 @@ public class UserServiceImpl implements UserService{
 	AddressService addressService;
 	
 	@Override
-	public UserDto createUser(UserDto user) {
+	public UserBasicInformationDTO createUser(UserBasicInformationDTO user) {
 		
 		//check if email address already exist
 		if (userRepository.findByEmail(user.getEmail()) != null) throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 
 		for (int i = 0; i < user.getAddresses().size(); i++) {
-			AddressDto address = user.getAddresses().get(i);
+			UserAdressDTO address = user.getAddresses().get(i);
 			
-			//Implementing UserDetails inside address 
-			address.setUserDetails(user);
 			address.setAddressId(utils.generateAddressId(30));
 			user.getAddresses().set(i, address);
 		}
@@ -63,7 +61,7 @@ public class UserServiceImpl implements UserService{
 				
 		UserEntity storedUserDetails = userRepository.save(userEntity);
 		
-		UserDto userDtoCreationDetails = modelMapper.map(storedUserDetails, UserDto.class);
+		UserBasicInformationDTO userDtoCreationDetails = modelMapper.map(storedUserDetails, UserBasicInformationDTO.class);
 
 		new AmazonSES().verifyEmail(userDtoCreationDetails);
 		
@@ -86,30 +84,30 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDto getUserByEmail(String email) throws UserServiceException{
+	public UserBasicInformationDTO getUserByEmail(String email) throws UserServiceException{
 		
 		UserEntity userDetails = userRepository.findByEmail(email);
 		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
-		UserDto userDtoInformation = new UserDto();
+		UserBasicInformationDTO userDtoInformation = new UserBasicInformationDTO();
 		BeanUtils.copyProperties(userDetails, userDtoInformation);
 		
 		return userDtoInformation;
 	}
 
 	@Override
-	public UserDto getUserByUserId(String userId) throws UserServiceException{
+	public UserBasicInformationDTO getUserByUserId(String userId) throws UserServiceException{
 		 UserEntity userDetails = userRepository.findByUserId(userId);
 		 if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		 
-		 UserDto userDtoInformation = new UserDto();
+		 UserBasicInformationDTO userDtoInformation = new UserBasicInformationDTO();
 		 BeanUtils.copyProperties(userDetails, userDtoInformation);
 		 
 		 return userDtoInformation;
 	}
 	
 	@Override
-	public UserDto updateUser(String userId, UserDto user) throws UserServiceException{
+	public UserBasicInformationDTO updateUser(String userId, UserBasicInformationDTO user) throws UserServiceException{
 		UserEntity userDetails = userRepository.findByUserId(userId);
 		//I don't know if this exception is clear enough. Maybe change this in a near future
 		if(userDetails == null) throw new UserServiceException(ErrorMessages.COULD_NOT_UPDATE_RECORD.getErrorMessage());
@@ -119,7 +117,7 @@ public class UserServiceImpl implements UserService{
 		userDetails.setLastName(user.getLastName());
 		userRepository.save(userDetails);
 		
-		UserDto userDto = new UserDto();
+		UserBasicInformationDTO userDto = new UserBasicInformationDTO();
 		BeanUtils.copyProperties(userDetails, userDto);
 		
 		return userDto;
@@ -135,9 +133,9 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public List<UserDto> getUsers(int page, int limit) {
+	public List<UserBasicInformationDTO> getUsers(int page, int limit) {
 		
-		List<UserDto> returnValue = new ArrayList<>();
+		List<UserBasicInformationDTO> returnValue = new ArrayList<>();
 		
 		PageRequest pageableRequest = PageRequest.of(page, limit);
 		
@@ -146,7 +144,7 @@ public class UserServiceImpl implements UserService{
 		List<UserEntity> userListDetails = userPage.getContent();
 		
 		for(final UserEntity user : userListDetails) {
-			UserDto userModel = new UserDto();
+			UserBasicInformationDTO userModel = new UserBasicInformationDTO();
 			BeanUtils.copyProperties(user, userModel);
 			returnValue.add(userModel);
 		}

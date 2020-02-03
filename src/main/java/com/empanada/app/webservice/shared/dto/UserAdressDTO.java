@@ -1,6 +1,6 @@
 package com.empanada.app.webservice.shared.dto;
 
-public class AddressDto {
+public class UserAdressDTO {
 	
 	private long id;
 	private String addressId;
@@ -8,8 +8,6 @@ public class AddressDto {
 	private String country;
 	private String streetName;
 	private String postalCode;
-	// It's supossed to get some information from the user who has that address (not sure about the impl) TODO
-	private UserDto userDetails;
 	
 	public long getId() {
 		return id;
@@ -40,12 +38,6 @@ public class AddressDto {
 	}
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
-	}
-	public UserDto getUserDetails() {
-		return userDetails;
-	}
-	public void setUserDetails(UserDto userDetails) {
-		this.userDetails = userDetails;
 	}
 	public String getAddressId() {
 		return addressId;

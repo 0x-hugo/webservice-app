@@ -2,12 +2,12 @@ package com.empanada.app.webservice.service;
 
 import java.util.List;
 
-import com.empanada.app.webservice.shared.dto.AddressDto;
+import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 
 
 public interface AddressService {
 	
-	List<AddressDto> getAddresses(String userId);
+	List<UserAdressDTO> getAddresses(String userId);
 	
-	AddressDto getAddressByAddressId(String addressId);
+	UserAdressDTO getAddressByAddressId(String addressId);
 }

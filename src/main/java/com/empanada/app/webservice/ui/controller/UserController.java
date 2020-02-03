@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
@@ -28,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
-import com.empanada.app.webservice.shared.dto.AddressDto;
-import com.empanada.app.webservice.shared.dto.UserDto;
+import com.empanada.app.webservice.shared.dto.UserAdressDTO;
+import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
 import com.empanada.app.webservice.ui.model.response.AddressRest;
 import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
@@ -53,7 +52,7 @@ public class UserController {
 		UserRest userResponse = new UserRest();
 		ModelMapper modelMapper = new ModelMapper();
 		
-		UserDto userDto = userService.getUserByUserId(id);
+		UserBasicInformationDTO userDto = userService.getUserByUserId(id);
 		//Link userLink = linkTo(methodOn(UserController.class).).withSelfRel();
 //		BeanUtils.copyProperties(userDto, userResponse); it returns stackoverflow otherwise
 		
@@ -74,10 +73,10 @@ public class UserController {
 		if (page > 0) page -= 1;
 		
 		List<UserRest> returnValue = new ArrayList<UserRest>();
-		List<UserDto> userList = userService.getUsers(page, limit);
+		List<UserBasicInformationDTO> userList = userService.getUsers(page, limit);
 		
 		if(userList != null && !userList.isEmpty()) {
-			for(final UserDto user : userList) {
+			for(final UserBasicInformationDTO user : userList) {
 				UserRest userModel = new UserRest();
 				
 				//TODO: Look if links can be positioned on the json response
@@ -106,9 +105,9 @@ public class UserController {
 		//UserDto userDto = new UserDto();
 //		BeanUtils.copyProperties(userDetails, userDto);
 		ModelMapper modelMapper = new ModelMapper();
-		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
+		UserBasicInformationDTO userDto = modelMapper.map(userDetails, UserBasicInformationDTO.class);
 		
-		UserDto createdUser = userService.createUser(userDto);
+		UserBasicInformationDTO createdUser = userService.createUser(userDto);
 		//BeanUtils.copyProperties(createdUser, userResponse);
 		userResponse = modelMapper.map(createdUser, UserRest.class);
 		
@@ -121,11 +120,11 @@ public class UserController {
 	public UserRest updateUser (@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
 		UserRest userResponse = new UserRest();
 		
-		UserDto userDto = new UserDto();
-		userDto = new ModelMapper().map(userDetails, UserDto.class);
+		UserBasicInformationDTO userDto = new UserBasicInformationDTO();
+		userDto = new ModelMapper().map(userDetails, UserBasicInformationDTO.class);
 		
 		
-		UserDto updateUser = userService.updateUser(id, userDto);
+		UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
 		userResponse = new ModelMapper().map(updateUser, UserRest.class);
 //		BeanUtils.copyProperties(updateUser, userResponse);
 		
@@ -155,7 +154,7 @@ public class UserController {
 		public Resources<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
 		
 		List<AddressRest> addressesResponse = new ArrayList<>();
-		List<AddressDto> addressDto = new ArrayList<>();
+		List<UserAdressDTO> addressDto = new ArrayList<>();
 		ModelMapper modelMapper = new ModelMapper();
 		
 		addressDto = addressService.getAddresses(id);
@@ -191,7 +190,7 @@ public class UserController {
 		Link linkUser = linkTo(UserController.class).slash(userId).withRel("user");
 		Link linkAddresses = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
 		
-		AddressDto addressDto = addressService.getAddressByAddressId(addressId);
+		UserAdressDTO addressDto = addressService.getAddressByAddressId(addressId);
 		addressResponse = new ModelMapper().map(addressDto, AddressRest.class); 
 		
 		addressResponse.add(linkSelf);
