@@ -1,11 +1,9 @@
 package com.empanada.app.webservice.controller;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Test;
-import org.springframework.boot.test.context.TestComponent;
+import org.junit.jupiter.api.Test;
 
-@TestComponent
 public class UserController {
 
 	
