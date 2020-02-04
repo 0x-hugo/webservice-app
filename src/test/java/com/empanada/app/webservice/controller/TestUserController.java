@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
-public class UserController {
+public class TestUserController {
 
 	
 	@Test
-	public void getUserByUserId() {
-		System.out.println("aloha");
+	public void getAllUsersFromDB() {
+		
 		fail();
 	}
 }

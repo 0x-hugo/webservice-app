@@ -79,16 +79,10 @@ public class UserController {
 			for(final UserBasicInformationDTO user : userList) {
 				UserRest userModel = new UserRest();
 				
-				//TODO: Look if links can be positioned on the json response
 				Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
 				userModel = new ModelMapper().map(user, UserRest.class);
 				userModel.add(userLink);
-	
-//				I don't like how it looks 
-//				for (AddressRest address : userModel.getAddresses()) {
-//					Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(userModel.getUserId(), address.getAddressId())).withRel("address");
-//					address.add(addressLink);
-//				}
+
 				returnValue.add(userModel);
 			}
 		}
