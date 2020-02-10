@@ -23,6 +23,8 @@ import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
+import com.empanada.app.webservice.ui.utils.PageRequestAdapter;
+import com.empanada.app.webservice.ui.utils.ResultPagination;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -133,11 +135,11 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public List<UserBasicInformationDTO> getUsers(int page, int limit) {
+	public List<UserBasicInformationDTO> getUsers(ResultPagination pagination) {
 		
 		List<UserBasicInformationDTO> returnValue = new ArrayList<>();
 		
-		PageRequest pageableRequest = PageRequest.of(page, limit);
+		PageRequest pageableRequest = PageRequestAdapter.of(pagination);
 		
 		Page<UserEntity> userPage = userRepository.findAll(pageableRequest);
 

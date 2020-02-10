@@ -35,6 +35,7 @@ import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
+import com.empanada.app.webservice.ui.utils.ResultPagination;
 
 @RestController
 @RequestMapping("/users") // http://localhost:8080/users
@@ -66,14 +67,14 @@ public class UserController {
 		return new Resource<>(userResponse);
 	}
 	
+	//TODO: extract "defaultValue" knowledge from controller to its object
 	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
 	public Resources<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
 											@RequestParam(value = "limit", defaultValue = "5") int limit){
-		//for confusion (it took me long time to figure out page 0 was the problem) set page 1 as page 0
-		if (page > 0) page -= 1;
+		ResultPagination pagination = ResultPagination.buildPagination(page, limit);
 		
 		List<UserRest> returnValue = new ArrayList<UserRest>();
-		List<UserBasicInformationDTO> userList = userService.getUsers(page, limit);
+		List<UserBasicInformationDTO> userList = userService.getUsers(pagination);
 		
 		if(userList != null && !userList.isEmpty()) {
 			for(final UserBasicInformationDTO user : userList) {
