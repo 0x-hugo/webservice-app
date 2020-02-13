@@ -67,28 +67,31 @@ public class UserController {
 		return new Resource<>(userResponse);
 	}
 	
-	//TODO: extract "defaultValue" knowledge from controller to its object
+	//TODO: extract "defaultValue" knowledge from controller params to its object
 	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
 	public Resources<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
 											@RequestParam(value = "limit", defaultValue = "5") int limit){
-		ResultPagination pagination = ResultPagination.buildPagination(page, limit);
+		ResultPagination pagination = ResultPagination.buildPagination(page, limit);		
 		
-		List<UserRest> returnValue = new ArrayList<UserRest>();
 		List<UserBasicInformationDTO> userList = userService.getUsers(pagination);
-		
-		if(userList != null && !userList.isEmpty()) {
-			for(final UserBasicInformationDTO user : userList) {
-				UserRest userModel = new UserRest();
-				
-				Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
-				userModel = new ModelMapper().map(user, UserRest.class);
-				userModel.add(userLink);
+		List<UserRest> userLinkedList = linkUserInList(userList);
 
-				returnValue.add(userModel);
-			}
-		}
+		return new Resources<>(userLinkedList);
+	}
+
+	private List<UserRest> linkUserInList(List<UserBasicInformationDTO> userList) {
+		List<UserRest> returnValue = new ArrayList<UserRest>();
+		
+		for(final UserBasicInformationDTO user : userList) {
 			
-		return new Resources<>(returnValue);
+			Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId()))
+													.withRel("user");
+			UserRest userModel = new ModelMapper().map(user, UserRest.class);
+			userModel.add(userLink);
+			returnValue.add(userModel);
+		}
+		
+		return returnValue;
 	}
 	
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },

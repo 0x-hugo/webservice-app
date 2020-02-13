@@ -28,8 +28,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 		.permitAll()
 		.antMatchers(HttpMethod.GET, SecurityConstants.EMAIL_VERIFICATION_URL)
 		.permitAll()
-		.anyRequest()
-		.authenticated()
+//		.anyRequest()
+//		.authenticated()
 		.and()
 		//New AuthenticationFilter set up /login as default login url. It can also get updated by override getAuthenticationFilter
 		.addFilter(new AuthenticationFilter(authenticationManager()))

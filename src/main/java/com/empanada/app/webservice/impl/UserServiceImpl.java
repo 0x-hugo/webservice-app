@@ -1,6 +1,7 @@
 package com.empanada.app.webservice.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -150,6 +151,9 @@ public class UserServiceImpl implements UserService{
 			BeanUtils.copyProperties(user, userModel);
 			returnValue.add(userModel);
 		}
+		
+		if (returnValue.isEmpty())
+			return Collections.emptyList();
 		
 		return returnValue;
 	}
