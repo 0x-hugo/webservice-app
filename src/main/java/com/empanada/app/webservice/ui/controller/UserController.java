@@ -7,12 +7,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.Resources;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,8 @@ import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
 import com.empanada.app.webservice.ui.utils.ResultPagination;
 
+
+
 @RestController
 @RequestMapping("/users") // http://localhost:8080/users
 public class UserController {
@@ -49,7 +52,7 @@ public class UserController {
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public Resource<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
+	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
 		UserRest userResponse = new UserRest();
 		ModelMapper modelMapper = new ModelMapper();
 		
@@ -64,19 +67,19 @@ public class UserController {
 			address.add(addressLink);
 		}
 		
-		return new Resource<>(userResponse);
+		return new EntityModel<>(userResponse);
 	}
 	
 	//TODO: extract "defaultValue" knowledge from controller params to its object
 	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public Resources<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
+	public CollectionModel<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
 											@RequestParam(value = "limit", defaultValue = "5") int limit){
 		ResultPagination pagination = ResultPagination.buildPagination(page, limit);		
 		
 		List<UserBasicInformationDTO> userList = userService.getUsers(pagination);
 		List<UserRest> userLinkedList = linkUserInList(userList);
 
-		return new Resources<>(userLinkedList);
+		return new CollectionModel<>(userLinkedList);
 	}
 
 	private List<UserRest> linkUserInList(List<UserBasicInformationDTO> userList) {
@@ -149,7 +152,7 @@ public class UserController {
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
 				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-		public Resources<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
+		public CollectionModel<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
 		
 		List<AddressRest> addressesResponse = new ArrayList<>();
 		List<UserAdressDTO> addressDto = new ArrayList<>();
@@ -175,12 +178,12 @@ public class UserController {
 		
 		//BeanUtils.copyProperties(AddressDto, addressResponse);
 		
-		return new Resources<>(addressesResponse);
+		return new CollectionModel<>(addressesResponse);
 	}
 	
 	@GetMapping (	path = "/{userId}/addresses/{addressId}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-		public Resource<AddressRest>getAddressInformation (	@PathVariable String userId,
+		public EntityModel<AddressRest>getAddressInformation (	@PathVariable String userId,
 													@PathVariable String addressId) {
 		AddressRest addressResponse = new AddressRest();
 		//link al mismo controller
@@ -195,7 +198,7 @@ public class UserController {
 		addressResponse.add(linkAddresses);
 		addressResponse.add(linkUser);
 		
-		return new Resource<>(addressResponse);
+		return new EntityModel<>(addressResponse);
 	}
 	
 	/*

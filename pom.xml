@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.4.RELEASE</version>
+		<version>2.2.4.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.empanada.app.webservice</groupId>
@@ -45,10 +45,11 @@
 			<version>${spring-boot-framework.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
-			<version>${spring-boot-framework.version}</version>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-hateoas</artifactId>
+		    <version>${spring-boot-framework.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
