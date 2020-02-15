@@ -13,6 +13,6 @@ public class PageRequestWrapper extends PageRequest{
 	}
 
 	public static PageRequest of(ResultPagination pagination) {
-		return new PageRequestWrapper(pagination.getNumberOfPages(), pagination.getNumberOfPages());
+		return new PageRequestWrapper(pagination.getNumberOfPages(), pagination.getResultsPerPage());
 	}
 }

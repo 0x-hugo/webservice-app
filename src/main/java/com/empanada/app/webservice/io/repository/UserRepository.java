@@ -19,7 +19,7 @@ public interface UserRepository extends PagingAndSortingRepository<UserEntity, L
 	
 	UserEntity findByEmail (String email); //Spring creates the query by using "findBy" and the column
 
-	UserEntity findByUserId(String userId);
+	UserEntity findByPublicUserId(String publicUserId);
 	
 	UserEntity findByEmailVerificationToken(String token);
 	

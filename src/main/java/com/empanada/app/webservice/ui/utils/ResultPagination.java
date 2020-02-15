@@ -24,9 +24,10 @@ public class ResultPagination {
 		initializePages();
 	}
 	
-	//Index 0 
+	//Index 1
 	private void initializePages() {
-		if (numberOfPages > 0) numberOfPages --;
+//		if (numberOfPages < 1) numberOfPages ++;
+//		if (numberOfPages > 0) numberOfPages --;
 	}
 
 	private void setDefaultValues() {

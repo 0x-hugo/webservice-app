@@ -1,8 +1,8 @@
 package com.empanada.app.webservice.ui.model.response;
 
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
-public class AddressRest extends ResourceSupport {
+public class AddressRest extends RepresentationModel{
 
 	private String addressId;
 	private String city;

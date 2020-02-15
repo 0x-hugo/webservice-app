@@ -30,7 +30,7 @@ public class AddressServiceImpl implements AddressService {
 		ModelMapper modelMapper = new ModelMapper();
 		
 		//Because of public id, I cannot get the userDatabaseId and request db. I need, first, the object. 
-		UserEntity userEntity = userRepository.findByUserId(userId);
+		UserEntity userEntity = userRepository.findByPublicUserId(userId);
 		if (userEntity == null) return returnValue;
 		
 		Iterable<AddressEntity> addresses = addressRepository.findAllByUserDetails(userEntity);

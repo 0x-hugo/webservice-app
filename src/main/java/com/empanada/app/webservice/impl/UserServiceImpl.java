@@ -19,7 +19,6 @@ import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
-import com.empanada.app.webservice.shared.AmazonSES;
 import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
@@ -58,7 +57,7 @@ public class UserServiceImpl implements UserService{
 		//BeanUtils.copyProperties(user, userEntity);
 		UserEntity userEntity = modelMapper.map(user, UserEntity.class);
 		String publicUserId = utils.generateUserId(30);
-		userEntity.setUserId(publicUserId); 
+		userEntity.setPublicUserId(publicUserId); 
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		userEntity.setEmailVerificationToken(Utils.generateVerificationToken(publicUserId));
 				
@@ -66,7 +65,7 @@ public class UserServiceImpl implements UserService{
 		
 		UserBasicInformationDTO userDtoCreationDetails = modelMapper.map(storedUserDetails, UserBasicInformationDTO.class);
 
-		new AmazonSES().verifyEmail(userDtoCreationDetails);
+//		new AmazonSES().verifyEmail(userDtoCreationDetails);
 		
 		
 		return userDtoCreationDetails;
@@ -100,7 +99,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserBasicInformationDTO getUserByUserId(String userId) throws UserServiceException{
-		 UserEntity userDetails = userRepository.findByUserId(userId);
+		 UserEntity userDetails = userRepository.findByPublicUserId(userId);
 		 if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		 
 		 UserBasicInformationDTO userDtoInformation = new UserBasicInformationDTO();
@@ -111,7 +110,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public UserBasicInformationDTO updateUser(String userId, UserBasicInformationDTO user) throws UserServiceException{
-		UserEntity userDetails = userRepository.findByUserId(userId);
+		UserEntity userDetails = userRepository.findByPublicUserId(userId);
 		//I don't know if this exception is clear enough. Maybe change this in a near future
 		if(userDetails == null) throw new UserServiceException(ErrorMessages.COULD_NOT_UPDATE_RECORD.getErrorMessage());
 		
@@ -128,7 +127,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public void deleteUser(String userId) throws UserServiceException {
-		UserEntity userDetails = userRepository.findByUserId(userId);
+		UserEntity userDetails = userRepository.findByPublicUserId(userId);
 		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		userRepository.delete(userDetails);
