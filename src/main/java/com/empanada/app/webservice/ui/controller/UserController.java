@@ -1,8 +1,6 @@
 package com.empanada.app.webservice.ui.controller;
 
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +8,10 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +34,9 @@ import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
+import com.empanada.app.webservice.ui.utils.ResultPagination;
+
+
 
 @RestController
 @RequestMapping("/users") // http://localhost:8080/users
@@ -48,7 +50,7 @@ public class UserController {
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public Resource<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
+	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
 		UserRest userResponse = new UserRest();
 		ModelMapper modelMapper = new ModelMapper();
 		
@@ -63,37 +65,34 @@ public class UserController {
 			address.add(addressLink);
 		}
 		
-		return new Resource<>(userResponse);
+		return new EntityModel<>(userResponse);
 	}
 	
+	//TODO: extract "defaultValue" knowledge from controller params to its object
 	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public Resources<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
+	public CollectionModel<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
 											@RequestParam(value = "limit", defaultValue = "5") int limit){
-		//for confusion (it took me long time to figure out page 0 was the problem) set page 1 as page 0
-		if (page > 0) page -= 1;
+		ResultPagination pagination = ResultPagination.buildPagination(page, limit);		
 		
+		List<UserBasicInformationDTO> userList = userService.getUsers(pagination);
+		List<UserRest> userLinkedList = linkUserInList(userList);
+
+		return new CollectionModel<>(userLinkedList);
+	}
+
+	private List<UserRest> linkUserInList(List<UserBasicInformationDTO> userList) {
 		List<UserRest> returnValue = new ArrayList<UserRest>();
-		List<UserBasicInformationDTO> userList = userService.getUsers(page, limit);
 		
-		if(userList != null && !userList.isEmpty()) {
-			for(final UserBasicInformationDTO user : userList) {
-				UserRest userModel = new UserRest();
-				
-				//TODO: Look if links can be positioned on the json response
-				Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
-				userModel = new ModelMapper().map(user, UserRest.class);
-				userModel.add(userLink);
-	
-//				I don't like how it looks 
-//				for (AddressRest address : userModel.getAddresses()) {
-//					Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(userModel.getUserId(), address.getAddressId())).withRel("address");
-//					address.add(addressLink);
-//				}
-				returnValue.add(userModel);
-			}
-		}
+		for(final UserBasicInformationDTO user : userList) {
 			
-		return new Resources<>(returnValue);
+			Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId()))
+													.withRel("user");
+			UserRest userModel = new ModelMapper().map(user, UserRest.class);
+			userModel.add(userLink);
+			returnValue.add(userModel);
+		}
+		
+		return returnValue;
 	}
 	
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
@@ -151,7 +150,7 @@ public class UserController {
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
 				produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-		public Resources<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
+		public CollectionModel<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
 		
 		List<AddressRest> addressesResponse = new ArrayList<>();
 		List<UserAdressDTO> addressDto = new ArrayList<>();
@@ -177,12 +176,12 @@ public class UserController {
 		
 		//BeanUtils.copyProperties(AddressDto, addressResponse);
 		
-		return new Resources<>(addressesResponse);
+		return new CollectionModel<>(addressesResponse);
 	}
 	
 	@GetMapping (	path = "/{userId}/addresses/{addressId}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-		public Resource<AddressRest>getAddressInformation (	@PathVariable String userId,
+		public EntityModel<AddressRest>getAddressInformation (	@PathVariable String userId,
 													@PathVariable String addressId) {
 		AddressRest addressResponse = new AddressRest();
 		//link al mismo controller
@@ -197,7 +196,7 @@ public class UserController {
 		addressResponse.add(linkAddresses);
 		addressResponse.add(linkUser);
 		
-		return new Resource<>(addressResponse);
+		return new EntityModel<>(addressResponse);
 	}
 	
 	/*

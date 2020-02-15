@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
+import com.empanada.app.webservice.ui.utils.ResultPagination;
 
 public interface UserService extends UserDetailsService {
 
@@ -18,7 +19,7 @@ public interface UserService extends UserDetailsService {
 	
 	void deleteUser (String userId);
 
-	List<UserBasicInformationDTO> getUsers(int page, int value);
+	List<UserBasicInformationDTO> getUsers(ResultPagination pagination);
 
 	boolean verifyEmailToken(String token);
 }
