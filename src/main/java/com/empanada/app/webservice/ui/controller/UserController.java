@@ -42,11 +42,14 @@ import com.empanada.app.webservice.ui.utils.ResultPagination;
 @RequestMapping("/users") // http://localhost:8080/users
 public class UserController {
 	
-	@Autowired
 	UserService userService;
+	AddressService addressService;
 	
 	@Autowired
-	AddressService addressService;
+	public UserController(UserService userService, AddressService addressService) {
+		this.userService = userService;
+		this.addressService = addressService;
+	}
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
