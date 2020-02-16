@@ -51,21 +51,21 @@ public class UserController {
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
 	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
-		UserRest userResponse = new UserRest();
+		
 		ModelMapper modelMapper = new ModelMapper();
-		
 		UserBasicInformationDTO userDto = userService.getUserByUserId(id);
-		//Link userLink = linkTo(methodOn(UserController.class).).withSelfRel();
-//		BeanUtils.copyProperties(userDto, userResponse); it returns stackoverflow otherwise
 		
-		userResponse = modelMapper.map(userDto, UserRest.class);
+		UserRest userResponse = modelMapper.map(userDto, UserRest.class);
+		linkAddressesToUser(id, userResponse);
 		
+		return new EntityModel<>(userResponse);
+	}
+
+	private void linkAddressesToUser(String id, UserRest userResponse) {
 		for (AddressRest address : userResponse.getAddresses()) {
 			Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId())).withRel("address");
 			address.add(addressLink);
 		}
-		
-		return new EntityModel<>(userResponse);
 	}
 	
 	//TODO: extract "defaultValue" knowledge from controller params to its object
@@ -101,13 +101,10 @@ public class UserController {
 		//It needs to return an object with addresses
 		UserRest userResponse = new UserRest();
 		 
-		//UserDto userDto = new UserDto();
-//		BeanUtils.copyProperties(userDetails, userDto);
 		ModelMapper modelMapper = new ModelMapper();
 		UserBasicInformationDTO userDto = modelMapper.map(userDetails, UserBasicInformationDTO.class);
 		
 		UserBasicInformationDTO createdUser = userService.createUser(userDto);
-		//BeanUtils.copyProperties(createdUser, userResponse);
 		userResponse = modelMapper.map(createdUser, UserRest.class);
 		
 		return userResponse;
@@ -125,7 +122,6 @@ public class UserController {
 		
 		UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
 		userResponse = new ModelMapper().map(updateUser, UserRest.class);
-//		BeanUtils.copyProperties(updateUser, userResponse);
 		
 		return userResponse;
 	}
@@ -171,10 +167,6 @@ public class UserController {
 				address.add(userLink);
 			}
 		}
-		
-		
-		
-		//BeanUtils.copyProperties(AddressDto, addressResponse);
 		
 		return new CollectionModel<>(addressesResponse);
 	}
