@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.empanada.app.webservice.exceptions.UserServiceException;
+import com.empanada.app.webservice.pagination.PaginationIndex;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
@@ -34,7 +35,6 @@ import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
-import com.empanada.app.webservice.ui.utils.ResultPagination;
 
 
 
@@ -49,6 +49,42 @@ public class UserController {
 	public UserController(UserService userService, AddressService addressService) {
 		this.userService = userService;
 		this.addressService = addressService;
+	}
+	
+	//TODO: extract "defaultValue" knowledge from controller params to its object
+	/**
+	 * returns a linked list in hal+json format
+	 * */
+	@GetMapping (	
+			produces = { 
+				MediaType.APPLICATION_XML_VALUE, 
+				MediaType.APPLICATION_JSON_VALUE, 
+				"application/hal+json" 
+			})
+	public CollectionModel<UserRest> getUsersByPagination(	@RequestParam(value = "page", defaultValue = "0") 	int page,
+											@RequestParam(value = "limit", defaultValue = "5") int limit){
+		List<UserRest> userLinkedList = getLinkedUserListByPagination(page, limit);
+		return new CollectionModel<>(userLinkedList);
+	}
+
+	private List<UserRest> getLinkedUserListByPagination(int page, int limit) {
+		PaginationIndex paginationIndex = PaginationIndex.buildIndex(page, limit);
+		List<UserBasicInformationDTO> userList = userService.getUsers(paginationIndex);
+		return addDetailsToEachUsersWithLink(userList);
+	}
+
+	private List<UserRest> addDetailsToEachUsersWithLink(List<UserBasicInformationDTO> userList) {
+		List<UserRest> returnValue = new ArrayList<>();
+		
+		for(final UserBasicInformationDTO user : userList) {
+			
+			Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
+			UserRest userModel = new ModelMapper().map(user, UserRest.class);
+			userModel.add(userLink);
+			returnValue.add(userModel);
+		}
+		
+		return returnValue;
 	}
 	
 	@GetMapping (	path = "/{id}",
@@ -69,33 +105,6 @@ public class UserController {
 			Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId())).withRel("address");
 			address.add(addressLink);
 		}
-	}
-	
-	//TODO: extract "defaultValue" knowledge from controller params to its object
-	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public CollectionModel<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
-											@RequestParam(value = "limit", defaultValue = "5") int limit){
-		ResultPagination pagination = ResultPagination.buildPagination(page, limit);		
-		
-		List<UserBasicInformationDTO> userList = userService.getUsers(pagination);
-		List<UserRest> userLinkedList = linkUserInList(userList);
-
-		return new CollectionModel<>(userLinkedList);
-	}
-
-	private List<UserRest> linkUserInList(List<UserBasicInformationDTO> userList) {
-		List<UserRest> returnValue = new ArrayList<UserRest>();
-		
-		for(final UserBasicInformationDTO user : userList) {
-			
-			Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId()))
-													.withRel("user");
-			UserRest userModel = new ModelMapper().map(user, UserRest.class);
-			userModel.add(userLink);
-			returnValue.add(userModel);
-		}
-		
-		return returnValue;
 	}
 	
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },

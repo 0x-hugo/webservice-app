@@ -6,7 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.empanada.app.webservice.ui.utils.ResultPagination;
+import com.empanada.app.webservice.pagination.PaginationIndex;
 
 public class TestResultPagination {
 
@@ -22,13 +22,13 @@ public class TestResultPagination {
 	
 	@Test
 	private void initializePagesBiggerThan0Test() {
-		ResultPagination resultPagination = ResultPagination.buildPagination(5, 1);
+		PaginationIndex resultPagination = PaginationIndex.buildIndex(5, 1);
 		assertEquals(5, resultPagination.getNumberOfPages());
 	}
 	
 	@Test
 	private void initializePagesWith0() {
-		ResultPagination resultPagination = ResultPagination.buildPagination(0, 1);
+		PaginationIndex resultPagination = PaginationIndex.buildIndex(0, 1);
 		assertEquals(0, resultPagination.getNumberOfPages());
 	}
 

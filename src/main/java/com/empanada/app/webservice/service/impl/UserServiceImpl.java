@@ -7,8 +7,6 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,14 +15,14 @@ import org.springframework.stereotype.Service;
 import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
+import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
+import com.empanada.app.webservice.pagination.PaginationIndex;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
-import com.empanada.app.webservice.ui.utils.PageRequestWrapper;
-import com.empanada.app.webservice.ui.utils.ResultPagination;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -135,16 +133,14 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public List<UserBasicInformationDTO> getUsers(ResultPagination pagination) {
-		
+	public List<UserBasicInformationDTO> getUsers(PaginationIndex pagination) {
+		UserRepositoryPagination userResultPagination = new UserRepositoryPagination(pagination);
+		List<UserEntity> userListDetails = userResultPagination.getUsers();
+		return copyModelToResponse(userListDetails);
+	}
+	
+	private List<UserBasicInformationDTO> copyModelToResponse(List<UserEntity> userListDetails) {
 		List<UserBasicInformationDTO> returnValue = new ArrayList<>();
-		
-		PageRequest pageableRequest = PageRequestWrapper.of(pagination);
-		
-		Page<UserEntity> userPage = userRepository.findAll(pageableRequest);
-
-		List<UserEntity> userListDetails = userPage.getContent();
-		
 		for(final UserEntity user : userListDetails) {
 			UserBasicInformationDTO userModel = new UserBasicInformationDTO();
 			BeanUtils.copyProperties(user, userModel);
@@ -156,6 +152,7 @@ public class UserServiceImpl implements UserService{
 		
 		return returnValue;
 	}
+
 
 	// I will add a new token on the user so it can match with the one in db. 
 	// after that, null the field so you can't verify it twice
