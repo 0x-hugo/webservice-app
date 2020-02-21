@@ -1,14 +1,15 @@
 package com.empanada.app.webservice.controller;
 
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.empanada.app.webservice.ui.utils.ResultPagination;
+import com.empanada.app.webservice.pagination.Page;
 
-public class TestResultPagination {
+public class TestResultPaginationTest {
 
 	@BeforeEach
 	public void setup() {
@@ -22,14 +23,15 @@ public class TestResultPagination {
 	
 	@Test
 	private void initializePagesBiggerThan0Test() {
-		ResultPagination resultPagination = ResultPagination.buildPagination(5, 1);
-		assertEquals(5, resultPagination.getNumberOfPages());
+		Page resultPagination = Page.buildPage(5, 1);
+		assertEquals(5, resultPagination.getNumber());
+		fail();
 	}
 	
 	@Test
 	private void initializePagesWith0() {
-		ResultPagination resultPagination = ResultPagination.buildPagination(0, 1);
-		assertEquals(0, resultPagination.getNumberOfPages());
+		Page resultPagination = Page.buildPage(0, 1);
+		assertEquals(0, resultPagination.getNumber());
 	}
 
 }
