@@ -17,16 +17,16 @@ import com.empanada.app.webservice.io.repository.UserRepository;
 public class UserRepositoryPagination {
 	
 	private static final Logger logger = LogManager.getLogger(UserRepositoryPagination.class);
-	private PageRequest pageRequest;
-
-	UserRepository userRepository;
 	
-	public UserRepositoryPagination(UserRepository userRepository) {
-		this.userRepository = userRepository;
+	private PageRequest pageRequest;
+	private UserRepository userRepository;
+	
+	public UserRepositoryPagination(UserRepository userRepositoryImpl, com.empanada.app.webservice.pagination.Page page) {
+		this.userRepository = userRepositoryImpl;
+		this.pageRequest = PageRequest.of(page.getNumber(), page.getSize());
 	}
 	
-	public List<UserEntity> getUsers(PageRequest pageRequest) {
-		this.pageRequest = pageRequest;
+	public List<UserEntity> getUsers() {
 		try {
 			return findUsersByPage();
 		} catch(NullPointerException noItemsFoundException) {
@@ -35,7 +35,7 @@ public class UserRepositoryPagination {
 		}
 	}
 
-	public List<UserEntity> findUsersByPage() throws NullPointerException {
+	private List<UserEntity> findUsersByPage() throws NullPointerException {
 		Page<UserEntity> userPage = userRepository.findAll(pageRequest);
 		return userPage.getContent();
 	}

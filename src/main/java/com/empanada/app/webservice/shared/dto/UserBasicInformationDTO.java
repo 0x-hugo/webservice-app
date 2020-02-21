@@ -9,7 +9,7 @@ public class UserBasicInformationDTO implements Serializable{
 	//db id
 	private long id;
 	//public id
-	private String userId;
+	private String publicUserId;
 	private String firstName;
 	private String lastName;
 	private String email;
@@ -24,11 +24,11 @@ public class UserBasicInformationDTO implements Serializable{
 	public void setId(long id) {
 		this.id = id;
 	}
-	public String getUserId() {
-		return userId;
+	public String getPublicUserId() {
+		return publicUserId;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setPublicUserId(String publicUserId) {
+		this.publicUserId = publicUserId;
 	}
 	public String getFirstName() {
 		return firstName;

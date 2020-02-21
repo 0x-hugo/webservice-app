@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.empanada.app.webservice.exceptions.UserServiceException;
+import com.empanada.app.webservice.exceptions.UserNotFoundException;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService{
 	public UserBasicInformationDTO createUser(UserBasicInformationDTO user) {
 		
 		//check if email address already exist
-		if (userRepository.findByEmail(user.getEmail()) != null) throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
+		if (userRepository.findByEmail(user.getEmail()) != null) throw new UserNotFoundException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 
 		for (int i = 0; i < user.getAddresses().size(); i++) {
 			UserAdressDTO address = user.getAddresses().get(i);
@@ -71,10 +71,10 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UserServiceException {
+	public UserDetails loadUserByUsername(String email) throws UserNotFoundException {
 		UserEntity userLoginDetails = userRepository.findByEmail(email);
 		
-		if (userLoginDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userLoginDetails == null) throw new UserNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
 		//User is a Spring Security BEAN
 		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(),
@@ -85,9 +85,9 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserBasicInformationDTO getUserByEmail(String email) throws UserServiceException{
+	public UserBasicInformationDTO getUserByEmail(String email) throws UserNotFoundException{
 		UserEntity userDetails = userRepository.findByEmail(email);
-		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userDetails == null) throw new UserNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		UserBasicInformationDTO userDtoInformation = new UserBasicInformationDTO();
 		BeanUtils.copyProperties(userDetails, userDtoInformation);
@@ -96,10 +96,10 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserBasicInformationDTO getUserByPublicUserId(String userId) throws UserServiceException{
+	public UserBasicInformationDTO getUserByPublicUserId(String userId) throws UserNotFoundException{
 		 UserEntity userDetails = userRepository.findByPublicUserId(userId);
 		 if (userDetails == null) 
-			 throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+			 throw new UserNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		 
 		 UserBasicInformationDTO userDtoInformation = new UserBasicInformationDTO();
 		 BeanUtils.copyProperties(userDetails, userDtoInformation);
@@ -108,10 +108,10 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	@Override
-	public UserBasicInformationDTO updateUser(String userId, UserBasicInformationDTO user) throws UserServiceException{
+	public UserBasicInformationDTO updateUser(String userId, UserBasicInformationDTO user) throws UserNotFoundException{
 		UserEntity userDetails = userRepository.findByPublicUserId(userId);
 		//I don't know if this exception is clear enough. Maybe change this in a near future
-		if(userDetails == null) throw new UserServiceException(ErrorMessages.COULD_NOT_UPDATE_RECORD.getErrorMessage());
+		if(userDetails == null) throw new UserNotFoundException(ErrorMessages.COULD_NOT_UPDATE_RECORD.getErrorMessage());
 		
 		//BeanUtils.copyProperties(user, userDetails); This caused issues on identifier instance altered. I decided to use SET as a better alternative
 		userDetails.setFirstName(user.getFirstName());
@@ -125,18 +125,18 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	@Override
-	public void deleteUser(String userId) throws UserServiceException {
-		UserEntity userDetails = userRepository.findByPublicUserId(userId);
-		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+	public void deleteUserByPublicUserId(String publicUserId) throws UserNotFoundException {
+		UserEntity userDetails = userRepository.findByPublicUserId(publicUserId);
+		if (userDetails == null) 
+			throw new UserNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
 		userRepository.delete(userDetails);
-		
 	}
 
 	@Override
 	public List<UserBasicInformationDTO> getUsersIndexedByPage(Page page) {
-		UserRepositoryPagination userResultPagination = new UserRepositoryPagination(userRepository);
-		List<UserEntity> userListDetails = userResultPagination.getUsers(PageRequestWrapper.of(page));
+		UserRepositoryPagination userRepositoryByPagination = new UserRepositoryPagination(userRepository, page);
+		List<UserEntity> userListDetails = userRepositoryByPagination.getUsers();
 		return copyModelToResponse(userListDetails);
 	}
 	

@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.pagination.Page;
@@ -23,25 +25,22 @@ class UserRepositoryPaginationTest {
 	@Mock
 	private UserRepository userRepository;
 	
-	@Mock
-	Page paginationIndex;
+	private Page page;
 	
-	@InjectMocks
 	private UserRepositoryPagination userRepositoryPagination;
-	
-	private PageRequest pageRequest;
 	
 	@BeforeEach
 	void setUp() throws Exception {
-		paginationIndex = Page.buildPage(0, 5);
-		pageRequest = PageRequestWrapper.of(paginationIndex);
-		MockitoAnnotations.initMocks(this);	
+		MockitoAnnotations.initMocks(this);
+		page = Page.buildPage(0, 5);
+		userRepositoryPagination = new UserRepositoryPagination(userRepository, page);	
 	}
 	
 	@Test
 	void nullObjectInsteadOfNull() {
+		PageRequest pageRequest = PageRequestWrapper.of(page);
 		when(userRepository.findAll(pageRequest)).thenReturn(null);
-		assertThat(userRepositoryPagination.getUsers(pageRequest), is(Collections.emptyList()));
+		assertThat(userRepositoryPagination.getUsers(), is(Collections.emptyList()));
 	}
 	
 	@Test 

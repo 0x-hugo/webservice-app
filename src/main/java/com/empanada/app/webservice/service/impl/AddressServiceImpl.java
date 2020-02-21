@@ -17,15 +17,18 @@ import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 @Service
 public class AddressServiceImpl implements AddressService {
 
-	@Autowired
 	UserRepository userRepository;
+	AddressRepository addressRepository;
 	
 	@Autowired
-	AddressRepository addressRepository;
+	public AddressServiceImpl(UserRepository userRepositoryImpl, AddressRepository addressRepositoryImpl) {
+		userRepository = userRepositoryImpl;
+		addressRepository = addressRepositoryImpl;
+	}
 	
 	@Override
 	public List<UserAdressDTO> getAddresses(String userId) {
-		List<UserAdressDTO> returnValue = new ArrayList<UserAdressDTO>();
+		List<UserAdressDTO> returnValue = new ArrayList<>();
 		ModelMapper modelMapper = new ModelMapper();
 		
 		//Because of public id, I cannot get the userDatabaseId and request db. I need, first, the object. 
