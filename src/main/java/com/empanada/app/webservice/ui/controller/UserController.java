@@ -60,8 +60,7 @@ public class UserController {
 			produces = { 
 				MediaType.APPLICATION_XML_VALUE, 
 				MediaType.APPLICATION_JSON_VALUE, 
-				"application/hal+json" 
-			})
+				"application/hal+json" })
 	public CollectionModel<UserRest> getUsersByPagination(	
 											@RequestParam(value = "page", defaultValue = "0") 	int page,
 											@RequestParam(value = "limit", defaultValue = "5") int limit) {
@@ -117,32 +116,20 @@ public class UserController {
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } ) 
 	public UserRest createUser (@RequestBody UserDetailsRequestModel userDetails) {
-		//It needs to return an object with addresses
-		UserRest userResponse = new UserRest();
-		 
 		ModelMapper modelMapper = new ModelMapper();
 		UserBasicInformationDTO userDto = modelMapper.map(userDetails, UserBasicInformationDTO.class);
-		
 		UserBasicInformationDTO createdUser = userService.createUser(userDto);
-		userResponse = modelMapper.map(createdUser, UserRest.class);
 		
-		return userResponse;
+		return modelMapper.map(createdUser, UserRest.class);
 	}
 	
 	@PutMapping ( 	path = "/{id}",
 					consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } ) 
 	public UserRest updateUser (@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
-		UserRest userResponse = new UserRest();
-		
-		UserBasicInformationDTO userDto = new UserBasicInformationDTO();
-		userDto = new ModelMapper().map(userDetails, UserBasicInformationDTO.class);
-		
-		
+		UserBasicInformationDTO userDto = new ModelMapper().map(userDetails, UserBasicInformationDTO.class);
 		UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
-		userResponse = new ModelMapper().map(updateUser, UserRest.class);
-		
-		return userResponse;
+		return new ModelMapper().map(updateUser, UserRest.class);
 	}
 	
 	@DeleteMapping(	path = "/{id}",

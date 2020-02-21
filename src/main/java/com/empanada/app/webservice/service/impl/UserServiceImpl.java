@@ -141,17 +141,17 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	private List<UserBasicInformationDTO> copyModelToResponse(List<UserEntity> userListDetails) {
-		List<UserBasicInformationDTO> returnValue = new ArrayList<>();
+		List<UserBasicInformationDTO> usersBasicInfo = new ArrayList<>();
 		for(final UserEntity user : userListDetails) {
-			UserBasicInformationDTO userModel = new UserBasicInformationDTO();
-			BeanUtils.copyProperties(user, userModel);
-			returnValue.add(userModel);
+			UserBasicInformationDTO userBasicInfo = new UserBasicInformationDTO();
+			BeanUtils.copyProperties(user, userBasicInfo);
+			usersBasicInfo.add(userBasicInfo);
 		}
 		
-		if (returnValue.isEmpty())
+		if (usersBasicInfo.isEmpty())
 			return Collections.emptyList();
 		
-		return returnValue;
+		return usersBasicInfo;
 	}
 
 
