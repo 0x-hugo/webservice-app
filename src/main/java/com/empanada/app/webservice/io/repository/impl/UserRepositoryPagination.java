@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
-import com.empanada.app.webservice.pagination.PaginationIndex;
-import com.empanada.app.webservice.ui.utils.PageRequestWrapper;
 
 @Service
 public class UserRepositoryPagination {
@@ -21,18 +19,14 @@ public class UserRepositoryPagination {
 	private static final Logger logger = LogManager.getLogger(UserRepositoryPagination.class);
 	private PageRequest pageRequest;
 
-	private UserRepository userRepository;
+	UserRepository userRepository;
 	
-	@Autowired	
 	public UserRepositoryPagination(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
-
-	public UserRepositoryPagination (PaginationIndex indexPagination) {
-		pageRequest = PageRequestWrapper.of(indexPagination);
-	}
 	
-	public List<UserEntity> getUsers() {
+	public List<UserEntity> getUsers(PageRequest pageRequest) {
+		this.pageRequest = pageRequest;
 		try {
 			return findUsersByPage();
 		} catch(NullPointerException noItemsFoundException) {
@@ -41,17 +35,13 @@ public class UserRepositoryPagination {
 		}
 	}
 
-	private List<UserEntity> findUsersByPage() throws NullPointerException {
+	public List<UserEntity> findUsersByPage() throws NullPointerException {
 		Page<UserEntity> userPage = userRepository.findAll(pageRequest);
 		return userPage.getContent();
 	}
 	
 	public UserRepository getUserRepository() {
 		return userRepository;
-	}
-
-	public void setUserRepository(UserRepository userRepository) {
-		this.userRepository = userRepository;
 	}
 
 }

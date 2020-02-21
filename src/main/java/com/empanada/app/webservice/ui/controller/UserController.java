@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.empanada.app.webservice.exceptions.UserServiceException;
-import com.empanada.app.webservice.pagination.PaginationIndex;
+import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
+import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
@@ -68,8 +69,8 @@ public class UserController {
 	}
 
 	private List<UserRest> getLinkedUserListByPagination(int page, int limit) {
-		PaginationIndex paginationIndex = PaginationIndex.buildIndex(page, limit);
-		List<UserBasicInformationDTO> userList = userService.getUsers(paginationIndex);
+		Page paginationIndex = Page.buildPage(page, limit);
+		List<UserBasicInformationDTO> userList = userService.getUsersIndexedByPage(paginationIndex);
 		return addDetailsToEachUsersWithLink(userList);
 	}
 

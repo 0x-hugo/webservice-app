@@ -9,7 +9,7 @@ import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.ui.controller.UserController;
 
-public class TestUserController {
+public class UserControllerTest {
 
 	UserService userService;
 	

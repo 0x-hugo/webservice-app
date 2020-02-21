@@ -16,13 +16,14 @@ import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
-import com.empanada.app.webservice.pagination.PaginationIndex;
+import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
+import com.empanada.app.webservice.ui.utils.PageRequestWrapper;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -133,9 +134,9 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public List<UserBasicInformationDTO> getUsers(PaginationIndex pagination) {
-		UserRepositoryPagination userResultPagination = new UserRepositoryPagination(pagination);
-		List<UserEntity> userListDetails = userResultPagination.getUsers();
+	public List<UserBasicInformationDTO> getUsersIndexedByPage(Page page) {
+		UserRepositoryPagination userResultPagination = new UserRepositoryPagination(userRepository);
+		List<UserEntity> userListDetails = userResultPagination.getUsers(PageRequestWrapper.of(page));
 		return copyModelToResponse(userListDetails);
 	}
 	
