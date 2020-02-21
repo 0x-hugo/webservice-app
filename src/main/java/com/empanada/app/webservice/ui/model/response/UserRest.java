@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.hateoas.RepresentationModel;
 
-public class UserRest extends RepresentationModel{
+public class UserRest extends RepresentationModel<UserRest>{
 	
 	//public user id
 	private String userId;

@@ -86,7 +86,6 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserBasicInformationDTO getUserByEmail(String email) throws UserServiceException{
-		
 		UserEntity userDetails = userRepository.findByEmail(email);
 		if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		
@@ -97,9 +96,10 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserBasicInformationDTO getUserByUserId(String userId) throws UserServiceException{
+	public UserBasicInformationDTO getUserByPublicUserId(String userId) throws UserServiceException{
 		 UserEntity userDetails = userRepository.findByPublicUserId(userId);
-		 if (userDetails == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		 if (userDetails == null) 
+			 throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		 
 		 UserBasicInformationDTO userDtoInformation = new UserBasicInformationDTO();
 		 BeanUtils.copyProperties(userDetails, userDtoInformation);

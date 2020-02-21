@@ -62,48 +62,54 @@ public class UserController {
 				MediaType.APPLICATION_JSON_VALUE, 
 				"application/hal+json" 
 			})
-	public CollectionModel<UserRest> getUsersByPagination(	@RequestParam(value = "page", defaultValue = "0") 	int page,
-											@RequestParam(value = "limit", defaultValue = "5") int limit){
+	public CollectionModel<UserRest> getUsersByPagination(	
+											@RequestParam(value = "page", defaultValue = "0") 	int page,
+											@RequestParam(value = "limit", defaultValue = "5") int limit) {
 		List<UserRest> userLinkedList = getLinkedUserListByPagination(page, limit);
 		return new CollectionModel<>(userLinkedList);
 	}
 
 	private List<UserRest> getLinkedUserListByPagination(int page, int limit) {
 		Page paginationIndex = Page.buildPage(page, limit);
-		List<UserBasicInformationDTO> userList = userService.getUsersIndexedByPage(paginationIndex);
-		return addDetailsToEachUsersWithLink(userList);
+		List<UserBasicInformationDTO> basicUsersInformation = userService.getUsersIndexedByPage(paginationIndex);
+		return addLinkToEachUsersWithDetails(basicUsersInformation);
 	}
 
-	private List<UserRest> addDetailsToEachUsersWithLink(List<UserBasicInformationDTO> userList) {
-		List<UserRest> returnValue = new ArrayList<>();
+	private List<UserRest> addLinkToEachUsersWithDetails(List<UserBasicInformationDTO> basicUsersInformation) {
+		List<UserRest> users = new ArrayList<>();
 		
-		for(final UserBasicInformationDTO user : userList) {
+		for(final UserBasicInformationDTO basicUserInformation : basicUsersInformation) {
+			Link userDetailsLink = linkTo(methodOn(UserController.class)
+										.getUserInformation(basicUserInformation.getUserId()))
+									.withRel("user");
 			
-			Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
-			UserRest userModel = new ModelMapper().map(user, UserRest.class);
-			userModel.add(userLink);
-			returnValue.add(userModel);
+			UserRest userInformation = new ModelMapper().map(basicUserInformation, UserRest.class);
+			userInformation.add(userDetailsLink);
+			users.add(userInformation);
 		}
 		
-		return returnValue;
+		return users;
 	}
 	
 	@GetMapping (	path = "/{id}",
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
-		
-		ModelMapper modelMapper = new ModelMapper();
-		UserBasicInformationDTO userDto = userService.getUserByUserId(id);
-		
-		UserRest userResponse = modelMapper.map(userDto, UserRest.class);
-		linkAddressesToUser(id, userResponse);
-		
-		return new EntityModel<>(userResponse);
+	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {	
+		UserBasicInformationDTO userInfo = userService.getUserByPublicUserId(id);
+		return new EntityModel<>(addAddressLinkToUser(userInfo));
 	}
 
-	private void linkAddressesToUser(String id, UserRest userResponse) {
-		for (AddressRest address : userResponse.getAddresses()) {
-			Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId())).withRel("address");
+	private UserRest addAddressLinkToUser(UserBasicInformationDTO userDto) {
+		UserRest userInfo = new ModelMapper().map(userDto, UserRest.class);
+		linkAddressesToUser(userInfo);
+		return userInfo;
+	}
+
+	private void linkAddressesToUser(UserRest userInfo) {
+		
+		for (AddressRest address : userInfo.getAddresses()) {
+			Link addressLink = linkTo(methodOn(UserController.class)
+									.getAddressInformation(userInfo.getUserId(), address.getAddressId()))
+								.withRel("address");
 			address.add(addressLink);
 		}
 	}
