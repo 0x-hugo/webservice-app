@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.empanada.app.webservice.exceptions.UserServiceException;
+import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
+import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
@@ -34,7 +36,6 @@ import com.empanada.app.webservice.ui.model.response.OperationStatusModel;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
-import com.empanada.app.webservice.ui.utils.ResultPagination;
 
 
 
@@ -42,51 +43,43 @@ import com.empanada.app.webservice.ui.utils.ResultPagination;
 @RequestMapping("/users") // http://localhost:8080/users
 public class UserController {
 	
-	@Autowired
 	UserService userService;
-	
-	@Autowired
 	AddressService addressService;
 	
-	@GetMapping (	path = "/{id}",
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
-		UserRest userResponse = new UserRest();
-		ModelMapper modelMapper = new ModelMapper();
-		
-		UserBasicInformationDTO userDto = userService.getUserByUserId(id);
-		//Link userLink = linkTo(methodOn(UserController.class).).withSelfRel();
-//		BeanUtils.copyProperties(userDto, userResponse); it returns stackoverflow otherwise
-		
-		userResponse = modelMapper.map(userDto, UserRest.class);
-		
-		for (AddressRest address : userResponse.getAddresses()) {
-			Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId())).withRel("address");
-			address.add(addressLink);
-		}
-		
-		return new EntityModel<>(userResponse);
+	@Autowired
+	public UserController(UserService userService, AddressService addressService) {
+		this.userService = userService;
+		this.addressService = addressService;
 	}
 	
 	//TODO: extract "defaultValue" knowledge from controller params to its object
-	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public CollectionModel<UserRest> getUsers(	@RequestParam(value = "page", defaultValue = "0") 	int page,
+	/**
+	 * returns a linked list in hal+json format
+	 * */
+	@GetMapping (	
+			produces = { 
+				MediaType.APPLICATION_XML_VALUE, 
+				MediaType.APPLICATION_JSON_VALUE, 
+				"application/hal+json" 
+			})
+	public CollectionModel<UserRest> getUsersByPagination(	@RequestParam(value = "page", defaultValue = "0") 	int page,
 											@RequestParam(value = "limit", defaultValue = "5") int limit){
-		ResultPagination pagination = ResultPagination.buildPagination(page, limit);		
-		
-		List<UserBasicInformationDTO> userList = userService.getUsers(pagination);
-		List<UserRest> userLinkedList = linkUserInList(userList);
-
+		List<UserRest> userLinkedList = getLinkedUserListByPagination(page, limit);
 		return new CollectionModel<>(userLinkedList);
 	}
 
-	private List<UserRest> linkUserInList(List<UserBasicInformationDTO> userList) {
-		List<UserRest> returnValue = new ArrayList<UserRest>();
+	private List<UserRest> getLinkedUserListByPagination(int page, int limit) {
+		Page paginationIndex = Page.buildPage(page, limit);
+		List<UserBasicInformationDTO> userList = userService.getUsersIndexedByPage(paginationIndex);
+		return addDetailsToEachUsersWithLink(userList);
+	}
+
+	private List<UserRest> addDetailsToEachUsersWithLink(List<UserBasicInformationDTO> userList) {
+		List<UserRest> returnValue = new ArrayList<>();
 		
 		for(final UserBasicInformationDTO user : userList) {
 			
-			Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId()))
-													.withRel("user");
+			Link userLink = linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
 			UserRest userModel = new ModelMapper().map(user, UserRest.class);
 			userModel.add(userLink);
 			returnValue.add(userModel);
@@ -95,19 +88,36 @@ public class UserController {
 		return returnValue;
 	}
 	
+	@GetMapping (	path = "/{id}",
+					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {
+		
+		ModelMapper modelMapper = new ModelMapper();
+		UserBasicInformationDTO userDto = userService.getUserByUserId(id);
+		
+		UserRest userResponse = modelMapper.map(userDto, UserRest.class);
+		linkAddressesToUser(id, userResponse);
+		
+		return new EntityModel<>(userResponse);
+	}
+
+	private void linkAddressesToUser(String id, UserRest userResponse) {
+		for (AddressRest address : userResponse.getAddresses()) {
+			Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId())).withRel("address");
+			address.add(addressLink);
+		}
+	}
+	
 	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
 					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } ) 
 	public UserRest createUser (@RequestBody UserDetailsRequestModel userDetails) {
 		//It needs to return an object with addresses
 		UserRest userResponse = new UserRest();
 		 
-		//UserDto userDto = new UserDto();
-//		BeanUtils.copyProperties(userDetails, userDto);
 		ModelMapper modelMapper = new ModelMapper();
 		UserBasicInformationDTO userDto = modelMapper.map(userDetails, UserBasicInformationDTO.class);
 		
 		UserBasicInformationDTO createdUser = userService.createUser(userDto);
-		//BeanUtils.copyProperties(createdUser, userResponse);
 		userResponse = modelMapper.map(createdUser, UserRest.class);
 		
 		return userResponse;
@@ -125,7 +135,6 @@ public class UserController {
 		
 		UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
 		userResponse = new ModelMapper().map(updateUser, UserRest.class);
-//		BeanUtils.copyProperties(updateUser, userResponse);
 		
 		return userResponse;
 	}
@@ -171,10 +180,6 @@ public class UserController {
 				address.add(userLink);
 			}
 		}
-		
-		
-		
-		//BeanUtils.copyProperties(AddressDto, addressResponse);
 		
 		return new CollectionModel<>(addressesResponse);
 	}

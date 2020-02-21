@@ -24,7 +24,7 @@
 		<jsonwebtoken.version>0.6.0</jsonwebtoken.version>
 		<aws-sdk-ses.version>1.11.560</aws-sdk-ses.version>
 		<modelmapper.version>2.3.0</modelmapper.version>
-		<junit.version>5.6.0</junit.version>
+<!-- 		<junit.version>5.4.0</junit.version> -->
 		<mockito.version>3.2.4</mockito.version>
 	</properties>
 																										
@@ -90,16 +90,22 @@
 <!-- Testing -->
 
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 		    <groupId>org.junit.jupiter</groupId>
 		    <artifactId>junit-jupiter-api</artifactId>
-		    <version>${junit.version}</version>
+<!-- 		    <version>${junit.version}</version> -->
 		    <scope>test</scope>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.junit.jupiter</groupId>
 		    <artifactId>junit-jupiter-engine</artifactId>
-		    <version>${junit.version}</version>
+<!-- 		    <version>${junit.version}</version> -->
 		    <scope>test</scope>
 		</dependency>
 				
@@ -107,6 +113,13 @@
 		    <groupId>org.mockito</groupId>
 		    <artifactId>mockito-core</artifactId>
 		    <version>${mockito.version}</version>
+		    <scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>net.sourceforge.cobertura</groupId>
+		    <artifactId>cobertura</artifactId>
+		    <version>2.1.1</version>
 		    <scope>test</scope>
 		</dependency>
 

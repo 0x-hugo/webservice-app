@@ -1,4 +1,4 @@
-package com.empanada.app.webservice.impl;
+package com.empanada.app.webservice.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
