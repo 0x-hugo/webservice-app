@@ -2,7 +2,7 @@ package com.empanada.app.webservice.ui.model.response;
 
 import org.springframework.hateoas.RepresentationModel;
 
-public class AddressRest extends RepresentationModel<AddressRest>{
+public class AddressRest extends RepresentationModel<AddressRest> implements Cloneable{
 
 	private String addressId;
 	private String city;
@@ -10,6 +10,16 @@ public class AddressRest extends RepresentationModel<AddressRest>{
 	private String streetName;
 	private String postalCode;
 	
+	public AddressRest clone() {
+		AddressRest toClone = null;
+		try {
+			toClone = (AddressRest) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		
+		return toClone;
+	}
 	
 	public String getCity() {
 		return city;

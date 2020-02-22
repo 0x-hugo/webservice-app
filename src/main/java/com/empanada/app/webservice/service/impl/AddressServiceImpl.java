@@ -45,7 +45,7 @@ public class AddressServiceImpl implements AddressService {
 	}
 
 	@Override
-	public UserAdressDTO getAddressByAddressId(String addressId) {
+	public UserAdressDTO getAddressById(String addressId) {
 		UserAdressDTO returnValue = null;
 		AddressEntity addressEntity = addressRepository.findByAddressId(addressId);
 		

@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -147,8 +148,6 @@ public class UserController {
 		return operationStatus;
 	}
 	
-	
-	//if more functionalities added, I will create it's own controller 
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
 					produces = { 
@@ -187,20 +186,25 @@ public class UserController {
 							MediaType.APPLICATION_JSON_VALUE, 
 							"application/hal+json" })
 	public EntityModel<AddressRest>getAddressInformation ( @PathVariable String userId, @PathVariable String addressId) {
-		AddressRest addressResponse = new AddressRest();
-		//link al mismo controller
+		UserAdressDTO addressDto = addressService.getAddressById(addressId);
+		AddressRest addressResponse = new ModelMapper().map(addressDto, AddressRest.class); 
+		addressResponse = addDetailsToAddress(addressResponse, userId, addressId);
+		
+		return new EntityModel<>(addressResponse);
+	}
+	
+	private AddressRest addDetailsToAddress (final AddressRest address, String userId, String addressId) {
+		AddressRest addressResponse = address.clone();
+		
 		Link linkSelf = linkTo(methodOn(UserController.class).getAddressInformation(userId, addressId)).withSelfRel();
 		Link linkUser = linkTo(UserController.class).slash(userId).withRel("user");
 		Link linkAddresses = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
 		
-		UserAdressDTO addressDto = addressService.getAddressByAddressId(addressId);
-		addressResponse = new ModelMapper().map(addressDto, AddressRest.class); 
-		
 		addressResponse.add(linkSelf);
-		addressResponse.add(linkAddresses);
 		addressResponse.add(linkUser);
-		
-		return new EntityModel<>(addressResponse);
+		addressResponse.add(linkAddresses);
+
+		return addressResponse;
 	}
 	
 	/*

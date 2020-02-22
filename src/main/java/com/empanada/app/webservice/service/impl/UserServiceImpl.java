@@ -23,7 +23,6 @@ import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.UserAdressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
-import com.empanada.app.webservice.ui.utils.PageRequestWrapper;
 
 @Service
 public class UserServiceImpl implements UserService{
