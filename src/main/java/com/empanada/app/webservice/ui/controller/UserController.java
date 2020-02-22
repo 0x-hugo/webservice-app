@@ -1,6 +1,7 @@
 package com.empanada.app.webservice.ui.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.empanada.app.webservice.exceptions.UserNotFoundException;
 import com.empanada.app.webservice.exceptions.UserServiceException;
-import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
 import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
@@ -63,14 +62,14 @@ public class UserController {
 				MediaType.APPLICATION_JSON_VALUE, 
 				"application/hal+json" })
 	public CollectionModel<UserRest> getUsersByPagination(	
-											@RequestParam(value = "page", defaultValue = "0") 	int page,
-											@RequestParam(value = "limit", defaultValue = "5") int limit) {
-		List<UserRest> userLinkedList = getLinkedUserListByPagination(page, limit);
+											@RequestParam(value = "page", defaultValue = "0") 	int pageNumber,
+											@RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
+		List<UserRest> userLinkedList = getLinkedUserListByPagination(pageNumber, resultsLimit);
 		return new CollectionModel<>(userLinkedList);
 	}
 
-	private List<UserRest> getLinkedUserListByPagination(int page, int limit) {
-		Page paginationIndex = Page.buildPage(page, limit);
+	private List<UserRest> getLinkedUserListByPagination(int pageNumber, int resultsLimit) {
+		Page paginationIndex = Page.build(pageNumber, resultsLimit);
 		List<UserBasicInformationDTO> basicUsersInformation = userService.getUsersIndexedByPage(paginationIndex);
 		return addLinkToEachUsersWithDetails(basicUsersInformation);
 	}
@@ -149,7 +148,7 @@ public class UserController {
 	}
 	
 	
-	//if more functionalities added, I will create it's own controller
+	//if more functionalities added, I will create it's own controller 
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
 					produces = { 

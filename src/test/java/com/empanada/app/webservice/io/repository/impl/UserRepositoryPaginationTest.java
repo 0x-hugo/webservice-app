@@ -8,12 +8,9 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.pagination.Page;
@@ -22,7 +19,6 @@ import com.empanada.app.webservice.ui.utils.PageRequestWrapper;
 
 class UserRepositoryPaginationTest {
 	
-	@Mock
 	private UserRepository userRepository;
 	
 	private Page page;
@@ -31,15 +27,19 @@ class UserRepositoryPaginationTest {
 	
 	@BeforeEach
 	void setUp() throws Exception {
+		this.userRepository = Mockito.mock(UserRepository.class);
 		MockitoAnnotations.initMocks(this);
-		page = Page.buildPage(0, 5);
+		page = Page.build(0, 5);
 		userRepositoryPagination = new UserRepositoryPagination(userRepository, page);	
 	}
 	
 	@Test
 	void nullObjectInsteadOfNull() {
 		PageRequest pageRequest = PageRequestWrapper.of(page);
-		when(userRepository.findAll(pageRequest)).thenReturn(null);
+		
+		when(userRepository.findAll(pageRequest))
+			.thenReturn(null);
+		
 		assertThat(userRepositoryPagination.getUsers(), is(Collections.emptyList()));
 	}
 	

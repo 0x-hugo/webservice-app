@@ -5,7 +5,7 @@ public class Page{
 	private Integer number;
 	private Integer size;
 	
-	public static Page buildPage(int number, int size) {
+	public static Page build(int number, int size) {
 		return new Page(number, size);
 	}
 	
@@ -14,18 +14,11 @@ public class Page{
 		this.size = size;
 	}
 	
-	public static Page buildPage() {
+	public static Page build() {
 		return new Page();
 	}
 	
 	private Page() {
-		setDefaultValues();
-	}
-
-	private void setDefaultValues() {
-		this.number = 0;
-		this.size = 5;
-		
 	}
 
 	public int getNumber() {

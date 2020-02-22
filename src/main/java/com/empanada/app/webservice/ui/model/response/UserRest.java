@@ -12,7 +12,18 @@ public class UserRest extends RepresentationModel<UserRest>{
 	private String lastName;
 	private String email;
 	private List<AddressRest> addresses;
+	
+	public UserRest() {}
 
+	public UserRest(String userId, String firstName, String lastName, String email, List<AddressRest> addresses) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.addresses = addresses;
+	}
+	
 	public String getUserId() {
 		return userId;
 	}
@@ -44,5 +55,13 @@ public class UserRest extends RepresentationModel<UserRest>{
 		this.addresses = addresses;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
 	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -5,21 +5,22 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 
-@Service
+@Repository
 public class UserRepositoryPagination {
 	
 	private static final Logger logger = LogManager.getLogger(UserRepositoryPagination.class);
 	
 	private PageRequest pageRequest;
 	private UserRepository userRepository;
+	
+	public UserRepositoryPagination() {}
 	
 	public UserRepositoryPagination(UserRepository userRepositoryImpl, com.empanada.app.webservice.pagination.Page page) {
 		this.userRepository = userRepositoryImpl;
