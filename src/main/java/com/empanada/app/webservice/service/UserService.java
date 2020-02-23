@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.empanada.app.webservice.exceptions.UserNotFoundException;
 import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 
@@ -13,11 +14,11 @@ public interface UserService extends UserDetailsService {
 	
 	UserBasicInformationDTO getUserByEmail (String email);
 	
-	UserBasicInformationDTO getUserByUserId (String UserId);
+	UserBasicInformationDTO getUserByPublicUserId (String UserId);
 	
 	UserBasicInformationDTO updateUser (String userId, UserBasicInformationDTO user);
 	
-	void deleteUser (String userId);
+	void deleteUserByPublicUserId (String userId) throws UserNotFoundException;
 
 	List<UserBasicInformationDTO> getUsersIndexedByPage(Page pagination);
 

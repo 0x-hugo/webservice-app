@@ -1,7 +1,14 @@
 package com.empanada.app.webservice.shared.dto;
 
-public class UserAdressDTO {
+import java.io.Serializable;
+
+public class UserAdressDTO implements Serializable{
+	 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1538273992729877337L;
 	private long id;
 	private String addressId;
 	private String city;

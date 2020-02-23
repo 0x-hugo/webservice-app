@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.hateoas.RepresentationModel;
 
-public class UserRest extends RepresentationModel{
+public class UserRest extends RepresentationModel<UserRest>{
 	
 	//public user id
 	private String userId;
@@ -12,7 +12,7 @@ public class UserRest extends RepresentationModel{
 	private String lastName;
 	private String email;
 	private List<AddressRest> addresses;
-
+	
 	public String getUserId() {
 		return userId;
 	}
@@ -44,5 +44,13 @@ public class UserRest extends RepresentationModel{
 		this.addresses = addresses;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
 	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

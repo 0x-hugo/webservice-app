@@ -9,5 +9,5 @@ public interface AddressService {
 	
 	List<UserAdressDTO> getAddresses(String userId);
 	
-	UserAdressDTO getAddressByAddressId(String addressId);
+	UserAdressDTO getAddressById(String addressId);
 }

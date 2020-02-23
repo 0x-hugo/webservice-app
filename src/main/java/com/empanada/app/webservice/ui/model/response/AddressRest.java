@@ -2,14 +2,13 @@ package com.empanada.app.webservice.ui.model.response;
 
 import org.springframework.hateoas.RepresentationModel;
 
-public class AddressRest extends RepresentationModel{
+public class AddressRest extends RepresentationModel<AddressRest> {
 
 	private String addressId;
 	private String city;
 	private String country;
 	private String streetName;
 	private String postalCode;
-	
 	
 	public String getCity() {
 		return city;

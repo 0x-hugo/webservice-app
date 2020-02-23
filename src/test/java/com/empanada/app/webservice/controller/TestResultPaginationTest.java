@@ -23,14 +23,14 @@ public class TestResultPaginationTest {
 	
 	@Test
 	private void initializePagesBiggerThan0Test() {
-		Page resultPagination = Page.buildPage(5, 1);
+		Page resultPagination = Page.build(5, 1);
 		assertEquals(5, resultPagination.getNumber());
 		fail();
 	}
 	
 	@Test
 	private void initializePagesWith0() {
-		Page resultPagination = Page.buildPage(0, 1);
+		Page resultPagination = Page.build(0, 1);
 		assertEquals(0, resultPagination.getNumber());
 	}
 
