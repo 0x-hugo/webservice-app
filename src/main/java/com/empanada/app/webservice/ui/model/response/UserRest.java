@@ -13,17 +13,6 @@ public class UserRest extends RepresentationModel<UserRest>{
 	private String email;
 	private List<AddressRest> addresses;
 	
-	public UserRest() {}
-
-	public UserRest(String userId, String firstName, String lastName, String email, List<AddressRest> addresses) {
-		super();
-		this.userId = userId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.addresses = addresses;
-	}
-	
 	public String getUserId() {
 		return userId;
 	}

@@ -12,7 +12,6 @@ import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.mortbay.jetty.security.UserRealm;
 import org.springframework.hateoas.CollectionModel;
 
 import com.empanada.app.webservice.io.UserMock;

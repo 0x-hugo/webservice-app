@@ -4,7 +4,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -14,15 +13,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.empanada.app.webservice.exceptions.UserNotFoundException;
 import com.empanada.app.webservice.exceptions.UserServiceException;
@@ -53,15 +44,7 @@ public class UserController {
 		this.addressService = addressService;
 	}
 	
-	//TODO: extract "defaultValue" knowledge from controller params to its object
-	/**
-	 * returns a linked list in hal+json format
-	 * */
-	@GetMapping (	
-			produces = { 
-				MediaType.APPLICATION_XML_VALUE, 
-				MediaType.APPLICATION_JSON_VALUE, 
-				"application/hal+json" })
+	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,	"application/hal+json" })
 	public CollectionModel<UserRest> getUsersByPagination(	
 											@RequestParam(value = "page", defaultValue = "0") 	int pageNumber,
 											@RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
@@ -150,34 +133,36 @@ public class UserController {
 	
 	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
 	@GetMapping (	path = "/{id}/addresses",
-					produces = { 
-							MediaType.APPLICATION_XML_VALUE, 
-							MediaType.APPLICATION_JSON_VALUE, 
-							"application/hal+json" })
+					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,	"application/hal+json" })
 	public CollectionModel<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
 		List<AddressRest> addresses = new ArrayList<>();
 		
-		List<UserAdressDTO> addressInfo = addressService.getAddresses(id);
+		List<UserAdressDTO> addressesInfo = addressService.getAddresses(id);
 		
-		if(addressInfo != null && !addressInfo.isEmpty()) {
-			//this is for mapping lists. 
-			java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
-			addresses = new ModelMapper().map(addressInfo, listType);
+		//this is for mapping lists. 
+		java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+		addresses = new ModelMapper().map(addressesInfo, listType);
+		
+		addresses = addLinksToAddresses(id, addresses);
+	
+		return new CollectionModel<>(addresses);
+	}
+
+	private List<AddressRest> addLinksToAddresses(String id, List<AddressRest> addresses) {
+		List<AddressRest> addressesCopy = new ArrayList<>(addresses); 
+		for (AddressRest address: addressesCopy) {
+			Link addressLink = linkTo(methodOn(UserController.class)
+									.getAddressInformation(id, address.getAddressId()))
+								.withRel("address");
+			address.add(addressLink);
 			
-			for (AddressRest address: addresses) {
-				Link addressLink = linkTo(methodOn(UserController.class)
-										.getAddressInformation(id, address.getAddressId()))
-									.withRel("address");
-				address.add(addressLink);
-				
-				Link userLink = linkTo(methodOn(UserController.class)
-									.getUserInformation(id))
-								.withRel("user");
-				address.add(userLink);
-			}
+			Link userLink = linkTo(methodOn(UserController.class)
+								.getUserInformation(id))
+							.withRel("user");
+			address.add(userLink);
 		}
 		
-		return new CollectionModel<>(addresses);
+		return addressesCopy;
 	}
 	
 	@GetMapping (	path = "/{userId}/addresses/{addressId}",
@@ -194,7 +179,7 @@ public class UserController {
 	}
 	
 	private AddressRest addDetailsToAddress (final AddressRest address, String userId, String addressId) {
-		AddressRest addressResponse = address.clone();
+		AddressRest addressResponse = clone(address);
 		
 		Link linkSelf = linkTo(methodOn(UserController.class).getAddressInformation(userId, addressId)).withSelfRel();
 		Link linkUser = linkTo(UserController.class).slash(userId).withRel("user");
@@ -205,6 +190,14 @@ public class UserController {
 		addressResponse.add(linkAddresses);
 
 		return addressResponse;
+	}
+	
+	private AddressRest clone(AddressRest addressToCopy) {
+		ModelMapper mapper = new ModelMapper();
+		AddressRest copiedAddress = new AddressRest();
+		mapper.map(addressToCopy, copiedAddress);
+		
+		return copiedAddress;
 	}
 	
 	/*

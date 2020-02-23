@@ -1,8 +1,11 @@
 package com.empanada.app.webservice.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ public class AddressServiceImpl implements AddressService {
 	UserRepository userRepository;
 	AddressRepository addressRepository;
 	
+	private static final Logger logger = LogManager.getLogger(AddressServiceImpl.class); 
+	
 	@Autowired
 	public AddressServiceImpl(UserRepository userRepositoryImpl, AddressRepository addressRepositoryImpl) {
 		userRepository = userRepositoryImpl;
@@ -28,20 +33,22 @@ public class AddressServiceImpl implements AddressService {
 	
 	@Override
 	public List<UserAdressDTO> getAddresses(String userId) {
-		List<UserAdressDTO> returnValue = new ArrayList<>();
-		ModelMapper modelMapper = new ModelMapper();
+		List<UserAdressDTO> userAddresses = new ArrayList<>();
+		ModelMapper mapper = new ModelMapper();
 		
-		//Because of public id, I cannot get the userDatabaseId and request db. I need, first, the object. 
-		UserEntity userEntity = userRepository.findByPublicUserId(userId);
-		if (userEntity == null) return returnValue;
+		UserEntity user = userRepository.findByPublicUserId(userId);
+		if (user == null) {
+			logger.debug("No addresses found with id [{}]", userId);
+			return Collections.emptyList();
+		}
 		
-		Iterable<AddressEntity> addresses = addressRepository.findAllByUserDetails(userEntity);
+		Iterable<AddressEntity> addresses = addressRepository.findAllByUserDetails(user);
 		for (AddressEntity addressEntity : addresses) {
-			returnValue.add( modelMapper.map(addressEntity,UserAdressDTO.class));
+			userAddresses.add( mapper.map(addressEntity,UserAdressDTO.class));
 		}
 		
 
-		return returnValue;
+		return userAddresses;
 	}
 
 	@Override
