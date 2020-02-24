@@ -29,197 +29,185 @@ import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
 
-
-
 @RestController
 @RequestMapping("/users") // http://localhost:8080/users
 public class UserController {
-	
-	UserService userService;
-	AddressService addressService;
-	
-	@Autowired
-	public UserController(UserService userService, AddressService addressService) {
-		this.userService = userService;
-		this.addressService = addressService;
-	}
-	
-	@GetMapping (	produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,	"application/hal+json" })
-	public CollectionModel<UserRest> getUsersByPagination(	
-											@RequestParam(value = "page", defaultValue = "0") 	int pageNumber,
-											@RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
-		List<UserRest> userLinkedList = getLinkedUserListByPagination(pageNumber, resultsLimit);
-		return new CollectionModel<>(userLinkedList);
-	}
 
-	private List<UserRest> getLinkedUserListByPagination(int pageNumber, int resultsLimit) {
-		Page paginationIndex = Page.build(pageNumber, resultsLimit);
-		List<UserBasicInformationDTO> basicUsersInformation = userService.getUsersIndexedByPage(paginationIndex);
-		return addLinkToEachUsersWithDetails(basicUsersInformation);
-	}
+  UserService userService;
+  AddressService addressService;
 
-	private List<UserRest> addLinkToEachUsersWithDetails(List<UserBasicInformationDTO> basicUsersInformation) {
-		List<UserRest> users = new ArrayList<>();
-		
-		for(final UserBasicInformationDTO basicUserInformation : basicUsersInformation) {
-			Link userDetailsLink = linkTo(methodOn(UserController.class)
-										.getUserInformation(basicUserInformation.getPublicUserId()))
-									.withRel("user");
-			
-			UserRest userInformation = new ModelMapper().map(basicUserInformation, UserRest.class);
-			userInformation.add(userDetailsLink);
-			users.add(userInformation);
-		}
-		
-		return users;
-	}
-	
-	@GetMapping (	path = "/{id}",
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
-	public EntityModel<UserRest> getUserInformation (@PathVariable String id) throws UserServiceException {	
-		UserBasicInformationDTO userInfo = userService.getUserByPublicUserId(id);
-		return new EntityModel<>(addAddressLinkToUser(userInfo));
-	}
+  @Autowired
+  public UserController(UserService userService, AddressService addressService) {
+    this.userService = userService;
+    this.addressService = addressService;
+  }
 
-	private UserRest addAddressLinkToUser(UserBasicInformationDTO userDto) {
-		UserRest userInfo = new ModelMapper().map(userDto, UserRest.class);
-		linkAddressesToUser(userInfo);
-		return userInfo;
-	}
+  @GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+  public CollectionModel<UserRest> getUsersByPagination(
+      @RequestParam(value = "page", defaultValue = "0") int pageNumber,
+      @RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
+    final List<UserRest> userLinkedList = getLinkedUserListByPagination(pageNumber, resultsLimit);
+    return new CollectionModel<>(userLinkedList);
+  }
 
-	private void linkAddressesToUser(UserRest userInfo) {
-		for (AddressRest address : userInfo.getAddresses()) {
-			Link addressLink = linkTo(methodOn(UserController.class)
-									.getAddressInformation(userInfo.getUserId(), address.getAddressId()))
-								.withRel("address");
-			address.add(addressLink);
-		}
-	}
-	
-	@PostMapping ( 	consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } ) 
-	public UserRest createUser (@RequestBody UserDetailsRequestModel userDetails) {
-		ModelMapper modelMapper = new ModelMapper();
-		UserBasicInformationDTO userDto = modelMapper.map(userDetails, UserBasicInformationDTO.class);
-		UserBasicInformationDTO createdUser = userService.createUser(userDto);
-		
-		return modelMapper.map(createdUser, UserRest.class);
-	}
-	
-	@PutMapping ( 	path = "/{id}",
-					consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } ) 
-	public UserRest updateUser (@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
-		UserBasicInformationDTO userDto = new ModelMapper().map(userDetails, UserBasicInformationDTO.class);
-		UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
-		return new ModelMapper().map(updateUser, UserRest.class);
-	}
-	
-	@DeleteMapping(	path = "/{id}",
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE } )
-	public OperationStatus deleteUser (@PathVariable String id) {
-		OperationStatus operationStatus = new OperationStatus();
-		operationStatus.setName(OperationStatusName.DELETE.name());
-		
-		try { 
-			userService.deleteUserByPublicUserId(id);
-			operationStatus.setResult(OperationStatusResult.SUCCESS.name());
-		} catch (UserNotFoundException e){
-			operationStatus.setResult(OperationStatusResult.ERROR.name());
-		}
-		
-		return operationStatus;
-	}
-	
-	// http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
-	@GetMapping (	path = "/{id}/addresses",
-					produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,	"application/hal+json" })
-	public CollectionModel<AddressRest> getUserAddresses (@PathVariable String id) throws UserServiceException {
-		List<AddressRest> addresses = new ArrayList<>();
-		
-		List<UserAdressDTO> addressesInfo = addressService.getAddresses(id);
-		
-		//this is for mapping lists. 
-		java.lang.reflect.Type listType = new TypeToken<List<AddressRest>>() {}.getType();
-		addresses = new ModelMapper().map(addressesInfo, listType);
-		
-		addresses = addLinksToAddresses(id, addresses);
-	
-		return new CollectionModel<>(addresses);
-	}
+  private List<UserRest> getLinkedUserListByPagination(int pageNumber, int resultsLimit) {
+    final Page paginationIndex = Page.build(pageNumber, resultsLimit);
+    final List<UserBasicInformationDTO> basicUsersInformation = userService.getUsersIndexedByPage(paginationIndex);
+    return addLinkToEachUsersWithDetails(basicUsersInformation);
+  }
 
-	private List<AddressRest> addLinksToAddresses(String id, List<AddressRest> addresses) {
-		List<AddressRest> addressesCopy = new ArrayList<>(addresses); 
-		for (AddressRest address: addressesCopy) {
-			Link addressLink = linkTo(methodOn(UserController.class)
-									.getAddressInformation(id, address.getAddressId()))
-								.withRel("address");
-			address.add(addressLink);
-			
-			Link userLink = linkTo(methodOn(UserController.class)
-								.getUserInformation(id))
-							.withRel("user");
-			address.add(userLink);
-		}
-		
-		return addressesCopy;
-	}
-	
-	@GetMapping (	path = "/{userId}/addresses/{addressId}",
-					produces = { 
-							MediaType.APPLICATION_XML_VALUE, 
-							MediaType.APPLICATION_JSON_VALUE, 
-							"application/hal+json" })
-	public EntityModel<AddressRest>getAddressInformation ( @PathVariable String userId, @PathVariable String addressId) {
-		UserAdressDTO addressDto = addressService.getAddressById(addressId);
-		AddressRest addressResponse = new ModelMapper().map(addressDto, AddressRest.class); 
-		addressResponse = addDetailsToAddress(addressResponse, userId, addressId);
-		
-		return new EntityModel<>(addressResponse);
-	}
-	
-	private AddressRest addDetailsToAddress (final AddressRest address, String userId, String addressId) {
-		AddressRest addressResponse = clone(address);
-		
-		Link linkSelf = linkTo(methodOn(UserController.class).getAddressInformation(userId, addressId)).withSelfRel();
-		Link linkUser = linkTo(UserController.class).slash(userId).withRel("user");
-		Link linkAddresses = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
-		
-		addressResponse.add(linkSelf);
-		addressResponse.add(linkUser);
-		addressResponse.add(linkAddresses);
+  private List<UserRest> addLinkToEachUsersWithDetails(List<UserBasicInformationDTO> basicUsersInformation) {
+    final List<UserRest> users = new ArrayList<>();
 
-		return addressResponse;
-	}
-	
-	private AddressRest clone(AddressRest addressToCopy) {
-		ModelMapper mapper = new ModelMapper();
-		AddressRest copiedAddress = new AddressRest();
-		mapper.map(addressToCopy, copiedAddress);
-		
-		return copiedAddress;
-	}
-	
-	/*
-	 * http://localhost:8080/spring-ws-app/users/email-verification?token=jkld1kl3
-	 * */
-	@GetMapping (path = "/email-verification", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public OperationStatus verifyEmailToken (@RequestParam(value = "token") String token) {
-		OperationStatus returnValue = new OperationStatus();
-		returnValue.setName(OperationStatusName.VERIFY_EMAIL.name());
-		
-		boolean isVerified = userService.verifyEmailToken(token);
-		if (isVerified) {
-			returnValue.setResult(OperationStatusResult.SUCCESS.name());
-		}else {
-			returnValue.setResult(OperationStatusResult.ERROR.name());
-		}
-		
-		return returnValue;
-	}
+    for (final UserBasicInformationDTO basicUserInformation : basicUsersInformation) {
+      final Link userDetailsLink = linkTo(
+          methodOn(UserController.class).getUserInformation(basicUserInformation.getPublicUserId())).withRel("user");
 
-	
-	
-	
-	
+      final UserRest userInformation = new ModelMapper().map(basicUserInformation, UserRest.class);
+      userInformation.add(userDetailsLink);
+      users.add(userInformation);
+    }
+
+    return users;
+  }
+
+  @GetMapping(path = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,
+      "application/hal+json" })
+  public EntityModel<UserRest> getUserInformation(@PathVariable String id) throws UserServiceException {
+    final UserBasicInformationDTO userInfo = userService.getUserByPublicUserId(id);
+    return new EntityModel<>(addAddressLinkToUser(userInfo));
+  }
+
+  private UserRest addAddressLinkToUser(UserBasicInformationDTO userDto) {
+    final UserRest userInfo = new ModelMapper().map(userDto, UserRest.class);
+    linkAddressesToUser(userInfo);
+    return userInfo;
+  }
+
+  private void linkAddressesToUser(UserRest userInfo) {
+    for (final AddressRest address : userInfo.getAddresses()) {
+      final Link addressLink = linkTo(
+          methodOn(UserController.class).getAddressInformation(userInfo.getUserId(), address.getAddressId()))
+              .withRel("address");
+      address.add(addressLink);
+    }
+  }
+
+  @PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = {
+      MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
+    final ModelMapper modelMapper = new ModelMapper();
+    final UserBasicInformationDTO userDto = modelMapper.map(userDetails, UserBasicInformationDTO.class);
+    final UserBasicInformationDTO createdUser = userService.createUser(userDto);
+
+    return modelMapper.map(createdUser, UserRest.class);
+  }
+
+  @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
+          MediaType.APPLICATION_JSON_VALUE })
+  public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
+    final UserBasicInformationDTO userDto = new ModelMapper().map(userDetails, UserBasicInformationDTO.class);
+    final UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
+    return new ModelMapper().map(updateUser, UserRest.class);
+  }
+
+  @DeleteMapping(path = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  public OperationStatus deleteUser(@PathVariable String id) {
+    final OperationStatus operationStatus = new OperationStatus();
+    operationStatus.setName(OperationStatusName.DELETE.name());
+
+    try {
+      userService.deleteUserByPublicUserId(id);
+      operationStatus.setResult(OperationStatusResult.SUCCESS.name());
+    } catch (final UserNotFoundException e) {
+      operationStatus.setResult(OperationStatusResult.ERROR.name());
+    }
+
+    return operationStatus;
+  }
+
+  // http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
+  @GetMapping(path = "/{id}/addresses", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,
+      "application/hal+json" })
+  public CollectionModel<AddressRest> getUserAddresses(@PathVariable String id) throws UserServiceException {
+    final List<UserAdressDTO> addressesInfo = addressService.getAddresses(id);
+    List<AddressRest> addresses = mapNewAddresses(addressesInfo);
+    addresses = addLinksToAddresses(id, addresses);
+
+    return new CollectionModel<>(addresses);
+  }
+
+  private List<AddressRest> mapNewAddresses(List<UserAdressDTO> addressesInfo) {
+    // this is for mapping lists.
+    final java.lang.reflect.Type addresses = new TypeToken<List<AddressRest>>() {
+    }.getType();
+    return new ModelMapper().map(addressesInfo, addresses);
+  }
+
+  private List<AddressRest> addLinksToAddresses(String id, List<AddressRest> addresses) {
+    final List<AddressRest> addressesCopy = new ArrayList<>(addresses);
+    for (final AddressRest address : addressesCopy) {
+      final Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId()))
+          .withRel("address");
+      address.add(addressLink);
+
+      final Link userLink = linkTo(methodOn(UserController.class).getUserInformation(id)).withRel("user");
+      address.add(userLink);
+    }
+
+    return addressesCopy;
+  }
+
+  @GetMapping(path = "/{userId}/addresses/{addressId}", produces = { MediaType.APPLICATION_XML_VALUE,
+      MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+  public EntityModel<AddressRest> getAddressInformation(@PathVariable String userId, @PathVariable String addressId) {
+    final UserAdressDTO addressDto = addressService.getAddressById(addressId);
+    AddressRest addressResponse = new ModelMapper().map(addressDto, AddressRest.class);
+    addressResponse = addDetailsToAddress(addressResponse, userId, addressId);
+
+    return new EntityModel<>(addressResponse);
+  }
+
+  private AddressRest addDetailsToAddress(final AddressRest address, String userId, String addressId) {
+    final AddressRest addressResponse = clone(address);
+
+    final Link linkSelf = linkTo(methodOn(UserController.class).getAddressInformation(userId, addressId)).withSelfRel();
+    final Link linkUser = linkTo(UserController.class).slash(userId).withRel("user");
+    final Link linkAddresses = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
+
+    addressResponse.add(linkSelf);
+    addressResponse.add(linkUser);
+    addressResponse.add(linkAddresses);
+
+    return addressResponse;
+  }
+
+  private AddressRest clone(AddressRest addressToCopy) {
+    final ModelMapper mapper = new ModelMapper();
+    final AddressRest copiedAddress = new AddressRest();
+    mapper.map(addressToCopy, copiedAddress);
+
+    return copiedAddress;
+  }
+
+  /*
+   * http://localhost:8080/spring-ws-app/users/email-verification?token=jkld1kl3
+   */
+  @GetMapping(path = "/email-verification", produces = { MediaType.APPLICATION_JSON_VALUE,
+      MediaType.APPLICATION_XML_VALUE })
+  public OperationStatus verifyEmailToken(@RequestParam(value = "token") String token) {
+    final OperationStatus returnValue = new OperationStatus();
+    returnValue.setName(OperationStatusName.VERIFY_EMAIL.name());
+
+    final boolean isVerified = userService.verifyEmailToken(token);
+    if (isVerified) {
+      returnValue.setResult(OperationStatusResult.SUCCESS.name());
+    } else {
+      returnValue.setResult(OperationStatusResult.ERROR.name());
+    }
+
+    return returnValue;
+  }
+
 }

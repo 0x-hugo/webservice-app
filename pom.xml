@@ -24,10 +24,10 @@
 		<jsonwebtoken.version>0.6.0</jsonwebtoken.version>
 		<aws-sdk-ses.version>1.11.560</aws-sdk-ses.version>
 		<modelmapper.version>2.3.0</modelmapper.version>
-<!-- 		<junit.version>5.4.0</junit.version> -->
+		<!-- <junit.version>5.4.0</junit.version> -->
 		<mockito.version>3.2.4</mockito.version>
 	</properties>
-																										
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -45,9 +45,9 @@
 			<version>${spring-boot-framework.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-hateoas</artifactId>
-		    <version>${spring-boot-framework.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<version>${spring-boot-framework.version}</version>
 		</dependency>
 
 		<dependency>
@@ -56,38 +56,38 @@
 			<version>${spring-boot-framework.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>${modelmapper.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>${jsonwebtoken.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql-jdbc.version}</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>com.amazonaws</groupId>
-		    <artifactId>aws-java-sdk-ses</artifactId>
-		    <version>${aws-sdk-ses.version}</version>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-ses</artifactId>
+			<version>${aws-sdk-ses.version}</version>
 		</dependency>
-		
-<!-- Testing -->
+
+		<!-- Testing -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -96,51 +96,51 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>org.junit.jupiter</groupId>
-		    <artifactId>junit-jupiter-api</artifactId>
-<!-- 		    <version>${junit.version}</version> -->
-		    <scope>test</scope>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.junit.jupiter</groupId>
-		    <artifactId>junit-jupiter-engine</artifactId>
-<!-- 		    <version>${junit.version}</version> -->
-		    <scope>test</scope>
-		</dependency>
-				
-		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-core</artifactId>
-		    <version>${mockito.version}</version>
-		    <scope>test</scope>
-		</dependency>
-		
-		<dependency>
-		    <groupId>net.sourceforge.cobertura</groupId>
-		    <artifactId>cobertura</artifactId>
-		    <version>2.1.1</version>
-		    <scope>test</scope>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<!-- <version>${junit.version}</version> -->
+			<scope>test</scope>
 		</dependency>
 
-<!-- LOGGING				 -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<!-- <version>${junit.version}</version> -->
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.cobertura</groupId>
+			<artifactId>cobertura</artifactId>
+			<version>2.1.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- LOGGING -->
 
 		<!-- exclude logback , add log4j2 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
 
 	</dependencies>
 

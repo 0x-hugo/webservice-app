@@ -10,17 +10,17 @@ import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 
 public interface UserService extends UserDetailsService {
 
-	UserBasicInformationDTO createUser (UserBasicInformationDTO user);
-	
-	UserBasicInformationDTO getUserByEmail (String email);
-	
-	UserBasicInformationDTO getUserByPublicUserId (String UserId);
-	
-	UserBasicInformationDTO updateUser (String userId, UserBasicInformationDTO user);
-	
-	void deleteUserByPublicUserId (String userId) throws UserNotFoundException;
+  UserBasicInformationDTO createUser(UserBasicInformationDTO user);
 
-	List<UserBasicInformationDTO> getUsersIndexedByPage(Page pagination);
+  UserBasicInformationDTO getUserByEmail(String email);
 
-	boolean verifyEmailToken(String token);
+  UserBasicInformationDTO getUserByPublicUserId(String UserId);
+
+  UserBasicInformationDTO updateUser(String userId, UserBasicInformationDTO user);
+
+  void deleteUserByPublicUserId(String userId) throws UserNotFoundException;
+
+  List<UserBasicInformationDTO> getUsersIndexedByPage(Page pagination);
+
+  boolean verifyEmailToken(String token);
 }

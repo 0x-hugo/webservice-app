@@ -14,35 +14,36 @@ import com.empanada.app.webservice.io.repository.UserRepository;
 
 @Repository
 public class UserRepositoryPagination {
-	
-	private static final Logger logger = LogManager.getLogger(UserRepositoryPagination.class);
-	
-	private PageRequest pageRequest;
-	private UserRepository userRepository;
-	
-	public UserRepositoryPagination() {}
-	
-	public UserRepositoryPagination(UserRepository userRepositoryImpl, com.empanada.app.webservice.pagination.Page page) {
-		this.userRepository = userRepositoryImpl;
-		this.pageRequest = PageRequest.of(page.getNumber(), page.getSize());
-	}
-	
-	public List<UserEntity> getUsers() {
-		try {
-			return findUsersByPage();
-		} catch(NullPointerException noItemsFoundException) {
-			logger.info("no users found ");
-			return Collections.emptyList();
-		}
-	}
 
-	private List<UserEntity> findUsersByPage() throws NullPointerException {
-		Page<UserEntity> userPage = userRepository.findAll(pageRequest);
-		return userPage.getContent();
-	}
-	
-	public UserRepository getUserRepository() {
-		return userRepository;
-	}
+  private static final Logger logger = LogManager.getLogger(UserRepositoryPagination.class);
+
+  private PageRequest pageRequest;
+  private UserRepository userRepository;
+
+  public UserRepositoryPagination() {
+  }
+
+  public UserRepositoryPagination(UserRepository userRepositoryImpl, com.empanada.app.webservice.pagination.Page page) {
+    this.userRepository = userRepositoryImpl;
+    this.pageRequest = PageRequest.of(page.getNumber(), page.getSize());
+  }
+
+  public List<UserEntity> getUsers() {
+    try {
+      return findUsersByPage();
+    } catch (final NullPointerException noItemsFoundException) {
+      logger.info("no users found ");
+      return Collections.emptyList();
+    }
+  }
+
+  private List<UserEntity> findUsersByPage() throws NullPointerException {
+    final Page<UserEntity> userPage = userRepository.findAll(pageRequest);
+    return userPage.getContent();
+  }
+
+  public UserRepository getUserRepository() {
+    return userRepository;
+  }
 
 }

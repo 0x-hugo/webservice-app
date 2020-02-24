@@ -11,109 +11,109 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-@Entity(name="users")
-public class UserEntity implements Serializable{
+@Entity(name = "users")
+public class UserEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id // Primary key and Autoincrement
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private long id;
-	
-	@Column(nullable = false)
-	private String publicUserId;
-	
-	@Column(nullable = false, length = 50)
-	private String firstName;
-	
-	@Column(nullable = false, length = 50)
-	private String lastName;
-	
-	@Column(nullable = false, length = 50, unique = true)
-	private String email;
-	
-	@Column(nullable = false)
-	private String encryptedPassword;
-	
-	private String emailVerificationToken;
-	
-	@Column(nullable = false)
-	private Boolean emailVerficationStatus = false; 
-	
-	@OneToMany(mappedBy = "userDetails", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-	private List<AddressEntity> addresses;
-	
-	public long getId() {
-		return id;
-	}
+  @Id // Primary key and Autoincrement
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long id;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+  @Column(nullable = false)
+  private String publicUserId;
 
-	public String getPublicUserId() {
-		return publicUserId;
-	}
+  @Column(nullable = false, length = 50)
+  private String firstName;
 
-	public void setPublicUserId(String publicUserId) {
-		this.publicUserId = publicUserId;
-	}
+  @Column(nullable = false, length = 50)
+  private String lastName;
 
-	public String getFirstName() {
-		return firstName;
-	}
+  @Column(nullable = false, length = 50, unique = true)
+  private String email;
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+  @Column(nullable = false)
+  private String encryptedPassword;
 
-	public String getLastName() {
-		return lastName;
-	}
+  private String emailVerificationToken;
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+  @Column(nullable = false)
+  private Boolean emailVerficationStatus = false;
 
-	public String getEmail() {
-		return email;
-	}
+  @OneToMany(mappedBy = "userDetails", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+      CascadeType.REFRESH })
+  private List<AddressEntity> addresses;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+  public long getId() {
+    return id;
+  }
 
-	public String getEncryptedPassword() {
-		return encryptedPassword;
-	}
+  public void setId(long id) {
+    this.id = id;
+  }
 
-	public void setEncryptedPassword(String encryptedPassword) {
-		this.encryptedPassword = encryptedPassword;
-	}
+  public String getPublicUserId() {
+    return publicUserId;
+  }
 
-	public String getEmailVerificationToken() {
-		return emailVerificationToken;
-	}
+  public void setPublicUserId(String publicUserId) {
+    this.publicUserId = publicUserId;
+  }
 
-	public void setEmailVerificationToken(String emailVerificationToken) {
-		this.emailVerificationToken = emailVerificationToken;
-	}
+  public String getFirstName() {
+    return firstName;
+  }
 
-	public Boolean getEmailVerficationStatus() {
-		return emailVerficationStatus;
-	}
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-	public void setEmailVerficationStatus(Boolean emailVerficationStatus) {
-		this.emailVerficationStatus = emailVerficationStatus;
-	}
+  public String getLastName() {
+    return lastName;
+  }
 
-	public List<AddressEntity> getAddresses() {
-		return addresses;
-	}
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-	public void setAddresses(List<AddressEntity> addresses) {
-		this.addresses = addresses;
-	}
+  public String getEmail() {
+    return email;
+  }
 
-	
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getEncryptedPassword() {
+    return encryptedPassword;
+  }
+
+  public void setEncryptedPassword(String encryptedPassword) {
+    this.encryptedPassword = encryptedPassword;
+  }
+
+  public String getEmailVerificationToken() {
+    return emailVerificationToken;
+  }
+
+  public void setEmailVerificationToken(String emailVerificationToken) {
+    this.emailVerificationToken = emailVerificationToken;
+  }
+
+  public Boolean getEmailVerficationStatus() {
+    return emailVerficationStatus;
+  }
+
+  public void setEmailVerficationStatus(Boolean emailVerficationStatus) {
+    this.emailVerficationStatus = emailVerficationStatus;
+  }
+
+  public List<AddressEntity> getAddresses() {
+    return addresses;
+  }
+
+  public void setAddresses(List<AddressEntity> addresses) {
+    this.addresses = addresses;
+  }
+
 }

@@ -15,47 +15,44 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import io.jsonwebtoken.Jwts;
 
-public class AuthorizationFilter extends BasicAuthenticationFilter{
+public class AuthorizationFilter extends BasicAuthenticationFilter {
 
-	public AuthorizationFilter(AuthenticationManager authenticationManager) {
-		super(authenticationManager);
-	}
-	
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		String header = request.getHeader(SecurityConstants.HEADER_STRING);
-		
-		if(header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-			chain.doFilter(request, response);
-			return;
-		}
-		
-		UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		chain.doFilter(request, response);
-	
-	}
-	
-	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-		String token = request.getHeader(SecurityConstants.HEADER_STRING);
-		
-		if(token != null) {
-			
-			token = token.replace(SecurityConstants.TOKEN_PREFIX, "");
-			
-			//magia de Jwts
-			String user = Jwts.parser()
-					.setSigningKey( SecurityConstants.getTokenSecret())
-					.parseClaimsJws( token )
-					.getBody()
-					.getSubject();
-			
-			if (user != null) {
-				return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
-			}
-		}
-		
-		return null;
-	}
+  public AuthorizationFilter(AuthenticationManager authenticationManager) {
+    super(authenticationManager);
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
+    final String header = request.getHeader(SecurityConstants.HEADER_STRING);
+
+    if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+      chain.doFilter(request, response);
+      return;
+    }
+
+    final UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    chain.doFilter(request, response);
+
+  }
+
+  private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+    String token = request.getHeader(SecurityConstants.HEADER_STRING);
+
+    if (token != null) {
+
+      token = token.replace(SecurityConstants.TOKEN_PREFIX, "");
+
+      // magia de Jwts
+      final String user = Jwts.parser().setSigningKey(SecurityConstants.getTokenSecret()).parseClaimsJws(token)
+          .getBody().getSubject();
+
+      if (user != null) {
+        return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+      }
+    }
+
+    return null;
+  }
 }

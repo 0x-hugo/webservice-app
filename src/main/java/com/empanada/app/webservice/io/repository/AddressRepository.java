@@ -9,9 +9,9 @@ import com.empanada.app.webservice.io.entity.AddressEntity;
 import com.empanada.app.webservice.io.entity.UserEntity;
 
 @Repository
-public interface AddressRepository extends CrudRepository<AddressEntity, Long>{
+public interface AddressRepository extends CrudRepository<AddressEntity, Long> {
 
-	List<AddressEntity> findAllByUserDetails(UserEntity userEntity);
-	
-	AddressEntity findByAddressId(String addressId);
+  List<AddressEntity> findAllByUserDetails(UserEntity userEntity);
+
+  AddressEntity findByAddressId(String addressId);
 }
