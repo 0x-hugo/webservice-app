@@ -21,7 +21,7 @@ import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
 import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
-import com.empanada.app.webservice.shared.Utils;
+import com.empanada.app.webservice.shared.SecurityUtils;
 import com.empanada.app.webservice.shared.dto.UserAddressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
   UserRepository userRepository;
 
   @Autowired
-  Utils utils;
+  SecurityUtils utils;
 
   @Autowired
   BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -65,8 +65,8 @@ public class UserServiceImpl implements UserService {
 
   private void generateUserInfo(UserBasicInformationDTO user) {
     Assert.notNull(user, "User cannot be null");
-    final String publicUserId = utils.generateUserId(Utils.DEFAULT_LENGTH);
-    user.setEmailVerificationToken(Utils.generateVerificationToken(publicUserId));
+    final String publicUserId = utils.generateUserId(SecurityUtils.DEFAULT_LENGTH);
+    user.setEmailVerificationToken(SecurityUtils.generateVerificationToken(publicUserId));
     user.setPublicUserId(publicUserId);
     user.setEncryptedPassword(encriptPassword(user.getPassword()));
     generateAddressesId(user.getAddresses());
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
   private void generateAddressesId(List<UserAddressDTO> addresses) {
     addresses.forEach( address -> 
-    address.setAddressId(utils.generateAddressId(Utils.DEFAULT_LENGTH)));
+    address.setAddressId(utils.generateAddressId(SecurityUtils.DEFAULT_LENGTH)));
   }
 
   @Override
@@ -91,8 +91,6 @@ public class UserServiceImpl implements UserService {
     // User is a Spring Security BEAN
     return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(),
         userLoginDetails.getEmailVerficationStatus(), true, true, true, new ArrayList<>());
-
-    //		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
   }
 
   @Override
@@ -169,7 +167,7 @@ public class UserServiceImpl implements UserService {
   public void verifyEmailToken(String token) throws UserServiceException {
     try{
       final UserEntity userEntity = findUserByVerificationToken(token);
-      if (!Utils.hasTokenExpired(token))
+      if (!SecurityUtils.hasTokenExpired(token))
         saveEmailVerification(userEntity);
     } catch (UserNotFoundException e) {
       throw new UserServiceException("Could not verify user with token ["+token+"]");

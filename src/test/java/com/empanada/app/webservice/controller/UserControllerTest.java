@@ -21,7 +21,6 @@ import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.controller.UserController;
-import com.empanada.app.webservice.ui.model.response.UserRest;
 
 public class UserControllerTest {
 
