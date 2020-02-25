@@ -1,14 +1,27 @@
-package com.empanada.app.webservice.ui.model.response;
+package com.empanada.app.webservice.shared.dto;
 
-import org.springframework.hateoas.RepresentationModel;
+import java.io.Serializable;
 
-public class AddressRest extends RepresentationModel<AddressRest> {
+public class UserAddressDTO implements Serializable {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1538273992729877337L;
+  private long id;
   private String addressId;
   private String city;
   private String country;
   private String streetName;
   private String postalCode;
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
+  }
 
   public String getCity() {
     return city;
@@ -49,5 +62,4 @@ public class AddressRest extends RepresentationModel<AddressRest> {
   public void setAddressId(String addressId) {
     this.addressId = addressId;
   }
-
 }

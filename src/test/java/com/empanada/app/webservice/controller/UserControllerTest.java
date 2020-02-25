@@ -25,40 +25,40 @@ import com.empanada.app.webservice.ui.model.response.UserRest;
 
 public class UserControllerTest {
 
-	UserService userService;
-	AddressService addressService;
-	
-	private Page defaultPage;
-	
-	@BeforeEach
-	private void setup() {
-		userService = mock(UserService.class);
-		addressService = mock(AddressService.class);
-		MockitoAnnotations.initMocks(this);
-		mockPage();
-	}
-	
-	private void mockPage() {
-		defaultPage = PageMock.buildDefaultPage();
-	}
-	
-	@Test
-	public void getAllUsersFromDB() {
-		
-	}
-	
-	@SuppressWarnings("serial")
-	@Test
-	public void getUsersByPaginationTest() {
-		UserController userController = new UserController(this.userService, this.addressService);
-		UserRest userMock = new UserRest();
-		
-		when(userService.getUsersIndexedByPage( any() ))
-			.thenReturn(new ArrayList<UserBasicInformationDTO>() {{
-				add(UserMock.buildDefaultDTO());
-			}});
-		
-		assertThat(userController.getUsersByPagination(PageMock.getDefaultPagenumber(), PageMock.getDefaultResults()), 
-							is(new CollectionModel<>(Collections.emptyList())));
-	}
+  UserService userService;
+  AddressService addressService;
+
+  private Page defaultPage;
+
+  @BeforeEach
+  private void setup() {
+    userService = mock(UserService.class);
+    addressService = mock(AddressService.class);
+    MockitoAnnotations.initMocks(this);
+    mockPage();
+  }
+
+  private void mockPage() {
+    defaultPage = PageMock.buildDefaultPage();
+  }
+
+  @Test
+  public void getAllUsersFromDB() {
+
+  }
+
+  @SuppressWarnings("serial")
+  @Test
+  public void getUsersByPaginationTest() {
+    UserController userController = new UserController(this.userService, this.addressService);
+
+    when(userService.getUsersIndexedByPage(any())).thenReturn(new ArrayList<UserBasicInformationDTO>() {
+      {
+        add(UserMock.buildDefaultDTO());
+      }
+    });
+
+    assertThat(userController.getUsersByPagination(PageMock.getDefaultPagenumber(), PageMock.getDefaultResults()),
+        is(new CollectionModel<>(Collections.emptyList())));
+  }
 }

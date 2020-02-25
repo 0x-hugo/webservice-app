@@ -8,16 +8,15 @@ import com.empanada.app.webservice.io.repository.UserRepository;
 
 class AddressServiceImplTest {
 
-	@Mock
-	UserRepository userRepository;
-	
-	@Mock
-	AddressRepository addressRepository;
-	
-	@Test
-	void returnEmptyInsteadNull() {
-		
-		
-	}
+  @Mock
+  UserRepository userRepository;
+
+  @Mock
+  AddressRepository addressRepository;
+
+  @Test
+  void returnEmptyInsteadNull() {
+
+  }
 
 }
