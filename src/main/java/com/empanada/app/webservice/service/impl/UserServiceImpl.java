@@ -21,7 +21,6 @@ import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
 import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
-import com.empanada.app.webservice.shared.AmazonSES;
 import com.empanada.app.webservice.shared.Utils;
 import com.empanada.app.webservice.shared.dto.UserAddressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
@@ -50,7 +49,7 @@ public class UserServiceImpl implements UserService {
     ModelMapper mapper = new ModelMapper();
     UserEntity userEntity = generateModelToSave(user);
     userRepository.save(userEntity);
-    new AmazonSES().verifyEmail(mapper.map(userEntity, UserBasicInformationDTO.class));
+//    new AmazonSES().verifyEmail(mapper.map(userEntity, UserBasicInformationDTO.class));
     return mapper.map(userEntity,UserBasicInformationDTO.class);
   }
 

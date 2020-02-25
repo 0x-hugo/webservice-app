@@ -51,7 +51,6 @@ public class UserControllerTest {
   @Test
   public void getUsersByPaginationTest() {
     UserController userController = new UserController(this.userService, this.addressService);
-    UserRest userMock = new UserRest();
 
     when(userService.getUsersIndexedByPage(any())).thenReturn(new ArrayList<UserBasicInformationDTO>() {
       {
