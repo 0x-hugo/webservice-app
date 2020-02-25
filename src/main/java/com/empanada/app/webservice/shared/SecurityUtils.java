@@ -15,8 +15,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class SecurityUtils {
 
-  private final Random RANDOM = new SecureRandom();
-  private final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  private final Random random = new SecureRandom();
+  private static final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   public static final int DEFAULT_LENGTH = 30;
 
   public String generateUserId(int length) {
@@ -31,7 +31,7 @@ public class SecurityUtils {
     final StringBuilder randomString = new StringBuilder(length);
 
     for (int i = 0; i < length; i++) {
-      randomString.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
+      randomString.append(ALPHABET.charAt(random.nextInt(ALPHABET.length())));
     }
 
     return new String(randomString);
