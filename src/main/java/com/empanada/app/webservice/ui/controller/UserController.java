@@ -20,7 +20,7 @@ import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
-import com.empanada.app.webservice.shared.dto.UserAdressDTO;
+import com.empanada.app.webservice.shared.dto.UserAddressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.request.UserDetailsRequestModel;
 import com.empanada.app.webservice.ui.model.response.AddressRest;
@@ -93,8 +93,8 @@ public class UserController {
     }
   }
 
-  @PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = {
-      MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @PostMapping( consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
+                produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
     final ModelMapper modelMapper = new ModelMapper();
     final UserBasicInformationDTO userDto = modelMapper.map(userDetails, UserBasicInformationDTO.class);
@@ -127,18 +127,17 @@ public class UserController {
     return operationStatus;
   }
 
-  // http://localhost:8080/spring-ws-app/users/jonn3odkmw/addresses
   @GetMapping(path = "/{id}/addresses", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,
       "application/hal+json" })
   public CollectionModel<AddressRest> getUserAddresses(@PathVariable String id) throws UserServiceException {
-    final List<UserAdressDTO> addressesInfo = addressService.getAddresses(id);
+    final List<UserAddressDTO> addressesInfo = addressService.getAddresses(id);
     List<AddressRest> addresses = mapNewAddresses(addressesInfo);
     addresses = addLinksToAddresses(id, addresses);
 
     return new CollectionModel<>(addresses);
   }
 
-  private List<AddressRest> mapNewAddresses(List<UserAdressDTO> addressesInfo) {
+  private List<AddressRest> mapNewAddresses(List<UserAddressDTO> addressesInfo) {
     // this is for mapping lists.
     final java.lang.reflect.Type addresses = new TypeToken<List<AddressRest>>() {
     }.getType();
@@ -162,7 +161,7 @@ public class UserController {
   @GetMapping(path = "/{userId}/addresses/{addressId}", produces = { MediaType.APPLICATION_XML_VALUE,
       MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
   public EntityModel<AddressRest> getAddressInformation(@PathVariable String userId, @PathVariable String addressId) {
-    final UserAdressDTO addressDto = addressService.getAddressById(addressId);
+    final UserAddressDTO addressDto = addressService.getAddressById(addressId);
     AddressRest addressResponse = new ModelMapper().map(addressDto, AddressRest.class);
     addressResponse = addDetailsToAddress(addressResponse, userId, addressId);
 
@@ -197,17 +196,17 @@ public class UserController {
   @GetMapping(path = "/email-verification", produces = { MediaType.APPLICATION_JSON_VALUE,
       MediaType.APPLICATION_XML_VALUE })
   public OperationStatus verifyEmailToken(@RequestParam(value = "token") String token) {
-    final OperationStatus returnValue = new OperationStatus();
-    returnValue.setName(OperationStatusName.VERIFY_EMAIL.name());
+    final OperationStatus operationStatus = new OperationStatus();
+    operationStatus.setName(OperationStatusName.VERIFY_EMAIL.name());
 
-    final boolean isVerified = userService.verifyEmailToken(token);
-    if (isVerified) {
-      returnValue.setResult(OperationStatusResult.SUCCESS.name());
-    } else {
-      returnValue.setResult(OperationStatusResult.ERROR.name());
+    try {
+      userService.verifyEmailToken(token);
+      operationStatus.setResult(OperationStatusResult.SUCCESS.name());
+    } catch (UserServiceException e) {
+      operationStatus.setResult(OperationStatusResult.ERROR.name());
     }
 
-    return returnValue;
+    return operationStatus;
   }
 
 }

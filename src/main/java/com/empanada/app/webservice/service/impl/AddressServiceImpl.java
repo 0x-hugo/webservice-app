@@ -15,7 +15,7 @@ import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.AddressRepository;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.service.AddressService;
-import com.empanada.app.webservice.shared.dto.UserAdressDTO;
+import com.empanada.app.webservice.shared.dto.UserAddressDTO;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -32,8 +32,8 @@ public class AddressServiceImpl implements AddressService {
   }
 
   @Override
-  public List<UserAdressDTO> getAddresses(String userId) {
-    final List<UserAdressDTO> userAddresses = new ArrayList<>();
+  public List<UserAddressDTO> getAddresses(String userId) {
+    final List<UserAddressDTO> userAddresses = new ArrayList<>();
     final ModelMapper mapper = new ModelMapper();
 
     final UserEntity user = userRepository.findByPublicUserId(userId);
@@ -44,19 +44,19 @@ public class AddressServiceImpl implements AddressService {
 
     final Iterable<AddressEntity> addresses = addressRepository.findAllByUserDetails(user);
     for (final AddressEntity addressEntity : addresses) {
-      userAddresses.add(mapper.map(addressEntity, UserAdressDTO.class));
+      userAddresses.add(mapper.map(addressEntity, UserAddressDTO.class));
     }
 
     return userAddresses;
   }
 
   @Override
-  public UserAdressDTO getAddressById(String addressId) {
-    UserAdressDTO returnValue = null;
+  public UserAddressDTO getAddressById(String addressId) {
+    UserAddressDTO returnValue = null;
     final AddressEntity addressEntity = addressRepository.findByAddressId(addressId);
 
     if (addressEntity != null)
-      returnValue = new ModelMapper().map(addressEntity, UserAdressDTO.class);
+      returnValue = new ModelMapper().map(addressEntity, UserAddressDTO.class);
 
     return returnValue;
   }

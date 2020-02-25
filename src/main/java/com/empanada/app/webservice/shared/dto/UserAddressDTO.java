@@ -2,7 +2,7 @@ package com.empanada.app.webservice.shared.dto;
 
 import java.io.Serializable;
 
-public class UserAdressDTO implements Serializable {
+public class UserAddressDTO implements Serializable {
 
   /**
    * 

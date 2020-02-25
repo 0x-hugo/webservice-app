@@ -5,12 +5,13 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.empanada.app.webservice.exceptions.UserNotFoundException;
+import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 
 public interface UserService extends UserDetailsService {
 
-  UserBasicInformationDTO createUser(UserBasicInformationDTO user);
+  UserBasicInformationDTO createUser(UserBasicInformationDTO user) throws UserServiceException;
 
   UserBasicInformationDTO getUserByEmail(String email);
 
@@ -22,5 +23,5 @@ public interface UserService extends UserDetailsService {
 
   List<UserBasicInformationDTO> getUsersIndexedByPage(Page pagination);
 
-  boolean verifyEmailToken(String token);
+  void verifyEmailToken(String token) throws UserServiceException;
 }

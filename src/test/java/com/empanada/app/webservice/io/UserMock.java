@@ -4,19 +4,19 @@ import com.empanada.app.webservice.ui.model.response.UserRest;
 import com.empanada.app.webservice.shared.dto.*;
 
 public class UserMock {
-	
-	private UserRest userRest;
 
-	public static UserRest buildDefaultUserRest() {
-		return new UserRest();
-	}
-	
-	public static UserBasicInformationDTO buildDefaultDTO() {
-		return new UserBasicInformationDTO();
-	}
-	
-	private void getUserId () {
-		
-	}
+  private UserRest userRest;
+
+  public static UserRest buildDefaultUserRest() {
+    return new UserRest();
+  }
+
+  public static UserBasicInformationDTO buildDefaultDTO() {
+    return new UserBasicInformationDTO();
+  }
+
+  private void getUserId() {
+
+  }
 
 }

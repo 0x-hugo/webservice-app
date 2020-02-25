@@ -11,16 +11,19 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.empanada.app.webservice.exceptions.UserNotFoundException;
+import com.empanada.app.webservice.exceptions.UserServiceException;
 import com.empanada.app.webservice.io.entity.UserEntity;
 import com.empanada.app.webservice.io.repository.UserRepository;
 import com.empanada.app.webservice.io.repository.impl.UserRepositoryPagination;
 import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
+import com.empanada.app.webservice.shared.AmazonSES;
 import com.empanada.app.webservice.shared.Utils;
-import com.empanada.app.webservice.shared.dto.UserAdressDTO;
+import com.empanada.app.webservice.shared.dto.UserAddressDTO;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 
@@ -40,34 +43,43 @@ public class UserServiceImpl implements UserService {
   AddressService addressService;
 
   @Override
-  public UserBasicInformationDTO createUser(UserBasicInformationDTO user) {
-
-    // check if email address already exist
+  public UserBasicInformationDTO createUser(UserBasicInformationDTO user) throws UserServiceException {
     if (userRepository.findByEmail(user.getEmail()) != null)
-      throw new UserNotFoundException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
+      throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 
-    for (int i = 0; i < user.getAddresses().size(); i++) {
-      final UserAdressDTO address = user.getAddresses().get(i);
+    ModelMapper mapper = new ModelMapper();
+    UserEntity userEntity = generateModelToSave(user);
+    userRepository.save(userEntity);
+    new AmazonSES().verifyEmail(mapper.map(userEntity, UserBasicInformationDTO.class));
+    return mapper.map(userEntity,UserBasicInformationDTO.class);
+  }
 
-      address.setAddressId(utils.generateAddressId(30));
-      user.getAddresses().set(i, address);
-    }
-    final ModelMapper modelMapper = new ModelMapper();
-    // BeanUtils.copyProperties(user, userEntity);
-    final UserEntity userEntity = modelMapper.map(user, UserEntity.class);
-    final String publicUserId = utils.generateUserId(30);
-    userEntity.setPublicUserId(publicUserId);
-    userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-    userEntity.setEmailVerificationToken(Utils.generateVerificationToken(publicUserId));
+  private UserEntity generateModelToSave(final UserBasicInformationDTO user) {
+    UserBasicInformationDTO userCopy = cloneUser(user);
+    generateUserInfo(userCopy);
+    return new ModelMapper().map(userCopy, UserEntity.class);
+  }
 
-    final UserEntity storedUserDetails = userRepository.save(userEntity);
+  private UserBasicInformationDTO cloneUser(UserBasicInformationDTO user) {
+    return new ModelMapper().map(user, UserBasicInformationDTO.class);
+  }
 
-    final UserBasicInformationDTO userDtoCreationDetails = modelMapper.map(storedUserDetails,
-        UserBasicInformationDTO.class);
+  private void generateUserInfo(UserBasicInformationDTO user) {
+    Assert.notNull(user, "User cannot be null");
+    final String publicUserId = utils.generateUserId(Utils.DEFAULT_LENGTH);
+    user.setEmailVerificationToken(Utils.generateVerificationToken(publicUserId));
+    user.setPublicUserId(publicUserId);
+    user.setEncryptedPassword(encriptPassword(user.getPassword()));
+    generateAddressesId(user.getAddresses());
+  }
 
-//		new AmazonSES().verifyEmail(userDtoCreationDetails);
+  private String encriptPassword (String password) {
+    return bCryptPasswordEncoder.encode(password);
+  }
 
-    return userDtoCreationDetails;
+  private void generateAddressesId(List<UserAddressDTO> addresses) {
+    addresses.forEach( address -> 
+    address.setAddressId(utils.generateAddressId(Utils.DEFAULT_LENGTH)));
   }
 
   @Override
@@ -81,7 +93,7 @@ public class UserServiceImpl implements UserService {
     return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(),
         userLoginDetails.getEmailVerficationStatus(), true, true, true, new ArrayList<>());
 
-//		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
+    //		return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(), new ArrayList<>());
   }
 
   @Override
@@ -111,13 +123,9 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserBasicInformationDTO updateUser(String userId, UserBasicInformationDTO user) throws UserNotFoundException {
     final UserEntity userDetails = userRepository.findByPublicUserId(userId);
-    // I don't know if this exception is clear enough. Maybe change this in a near
-    // future
     if (userDetails == null)
       throw new UserNotFoundException(ErrorMessages.COULD_NOT_UPDATE_RECORD.getErrorMessage());
 
-    // BeanUtils.copyProperties(user, userDetails); This caused issues on identifier
-    // instance altered. I decided to use SET as a better alternative
     userDetails.setFirstName(user.getFirstName());
     userDetails.setLastName(user.getLastName());
     userRepository.save(userDetails);
@@ -158,25 +166,32 @@ public class UserServiceImpl implements UserService {
     return usersBasicInfo;
   }
 
-  // I will add a new token on the user so it can match with the one in db.
-  // after that, null the field so you can't verify it twice
   @Override
-  public boolean verifyEmailToken(String token) {
-    boolean returnValue = false;
-
-    final UserEntity userEntity = userRepository.findByEmailVerificationToken(token);
-
-    if (userEntity != null) {
-      final boolean hasTokenExpired = Utils.hasTokenExpired(token);
-      if (!hasTokenExpired) {
-        userEntity.setEmailVerificationToken(null);
-        userEntity.setEmailVerficationStatus(Boolean.TRUE);
-        userRepository.save(userEntity);
-        returnValue = true;
-      }
+  public void verifyEmailToken(String token) throws UserServiceException {
+    try{
+      final UserEntity userEntity = findUserByVerificationToken(token);
+      if (!Utils.hasTokenExpired(token))
+        saveEmailVerification(userEntity);
+    } catch (UserNotFoundException e) {
+      throw new UserServiceException("Could not verify user with token ["+token+"]");
     }
+  }
 
-    return returnValue;
+  private UserEntity findUserByVerificationToken(String token) throws UserNotFoundException {
+    final UserEntity userEntity = userRepository.findByEmailVerificationToken(token);
+    if (userEntity == null)
+      throw new UserNotFoundException("No user with token ["+token+"]");
+    return userEntity;
+  }
+
+  private void saveEmailVerification(final UserEntity userEntity) {
+    verifyEmailOnUser(userEntity);
+    userRepository.save(userEntity);
+  }
+
+  private void verifyEmailOnUser(final UserEntity userEntity) {
+    userEntity.setEmailVerificationToken(null);
+    userEntity.setEmailVerficationStatus(Boolean.TRUE);
   }
 
 }

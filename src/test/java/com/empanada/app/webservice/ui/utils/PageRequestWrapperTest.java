@@ -7,6 +7,5 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageRequest;
 
 class PageRequestWrapperTest {
-	
 
 }

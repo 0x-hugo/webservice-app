@@ -14,7 +14,7 @@ import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 @Service
 public class AmazonSES {
   // This address must be verified with Amazon SES.
-  final String FROM = "ivanlp10n2@gmail.com";
+  final String FROM = "annonymous@gmail.com";
 
   // The subject line for the email.
   final String SUBJECT = "One last step to complete your registration";

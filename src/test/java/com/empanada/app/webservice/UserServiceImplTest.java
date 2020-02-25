@@ -10,14 +10,14 @@ import static org.mockito.Mockito.*;
 import org.mockito.InjectMocks;
 
 public class UserServiceImplTest {
-	
-	@InjectMocks
-	UserService userService;
-	
-	@Mock
-	UserRepository userRepository;
-	
-	private void getAllUsers() {
-	}
+
+  @InjectMocks
+  UserService userService;
+
+  @Mock
+  UserRepository userRepository;
+
+  private void getAllUsers() {
+  }
 
 }

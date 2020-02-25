@@ -17,7 +17,7 @@ public class Utils {
 
   private final Random RANDOM = new SecureRandom();
   private final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  private final int RANDOM_LENGTH = 30;
+  public static final int DEFAULT_LENGTH = 30;
 
   public String generateUserId(int length) {
     return generateRandomString(length);
@@ -28,13 +28,13 @@ public class Utils {
   }
 
   private String generateRandomString(int length) {
-    final StringBuilder returnValue = new StringBuilder(length);
+    final StringBuilder randomString = new StringBuilder(length);
 
     for (int i = 0; i < length; i++) {
-      returnValue.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
+      randomString.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
     }
 
-    return new String(returnValue);
+    return new String(randomString);
   }
 
   public static boolean hasTokenExpired(String token) {
@@ -47,11 +47,9 @@ public class Utils {
   }
 
   public static String generateVerificationToken(String userId) {
-    final String token = Jwts.builder().setSubject(userId)
+    return Jwts.builder().setSubject(userId)
         .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_DATE))
         .signWith(SignatureAlgorithm.HS512, SecurityConstants.getTokenSecret()).compact();
-
-    return token;
   }
 
 }
