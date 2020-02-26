@@ -40,7 +40,7 @@ public class AddressEntity implements Serializable {
 
   @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
   @JoinColumn(name = "addresses")
-  private UserEntity userDetails;
+  private UserEntity user;
 
   public String getAddressId() {
     return addressId;
@@ -50,12 +50,12 @@ public class AddressEntity implements Serializable {
     this.addressId = addressId;
   }
 
-  public UserEntity getUserDetails() {
-    return userDetails;
+  public UserEntity getUser() {
+    return user;
   }
 
-  public void setUserDetails(UserEntity userDetails) {
-    this.userDetails = userDetails;
+  public void setUser(UserEntity userDetails) {
+    this.user = userDetails;
   }
 
   public long getId() {

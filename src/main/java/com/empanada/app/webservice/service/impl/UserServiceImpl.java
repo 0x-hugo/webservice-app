@@ -53,10 +53,10 @@ public class UserServiceImpl implements UserService {
     return mapper.map(userEntity,UserBasicInformationDTO.class);
   }
 
-  private UserEntity generateModelToSave(final UserBasicInformationDTO user) {
-    UserBasicInformationDTO userCopy = cloneUser(user);
-    generateUserInfo(userCopy);
-    return new ModelMapper().map(userCopy, UserEntity.class);
+  private UserEntity generateModelToSave(final UserBasicInformationDTO userOrig) {
+    UserBasicInformationDTO user = cloneUser(userOrig);
+    generateUserInfo(user);
+    return buildUserEntity(user);
   }
 
   private UserBasicInformationDTO cloneUser(UserBasicInformationDTO user) {
@@ -70,6 +70,16 @@ public class UserServiceImpl implements UserService {
     user.setPublicUserId(publicUserId);
     user.setEncryptedPassword(encriptPassword(user.getPassword()));
     generateAddressesId(user.getAddresses());
+  }
+  
+  private UserEntity buildUserEntity(UserBasicInformationDTO userCopy) {
+    UserEntity userTest =new ModelMapper().map(userCopy, UserEntity.class);
+    linkAddressEntity(userTest);
+    return userTest;
+  }
+
+  private void linkAddressEntity(UserEntity userTest) {
+    userTest.getAddresses().forEach(address -> address.setUser(userTest));
   }
 
   private String encriptPassword (String password) {
