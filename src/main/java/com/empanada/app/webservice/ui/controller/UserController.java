@@ -44,6 +44,7 @@ public class UserController {
 
   @GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
   public CollectionModel<UserRest> getUsersByPagination(
+      //TODO: extract this params default values to its own domain
       @RequestParam(value = "page", defaultValue = "0") int pageNumber,
       @RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
     final List<UserRest> userLinkedList = getLinkedUserListByPagination(pageNumber, resultsLimit);
@@ -52,23 +53,39 @@ public class UserController {
 
   private List<UserRest> getLinkedUserListByPagination(int pageNumber, int resultsLimit) {
     final Page paginationIndex = Page.build(pageNumber, resultsLimit);
-    final List<UserBasicInformationDTO> basicUsersInformation = userService.getUsersIndexedByPage(paginationIndex);
-    return addLinkToEachUsersWithDetails(basicUsersInformation);
+    final List<UserBasicInformationDTO> usersBasicInformation = userService.getUsersIndexedByPage(paginationIndex);
+    return addLinkDetails(usersBasicInformation);
   }
 
-  private List<UserRest> addLinkToEachUsersWithDetails(List<UserBasicInformationDTO> basicUsersInformation) {
+  private List<UserRest> addLinkDetails(List<UserBasicInformationDTO> usersBasicInformation) {
     final List<UserRest> users = new ArrayList<>();
-
-    for (final UserBasicInformationDTO basicUserInformation : basicUsersInformation) {
-      final Link userDetailsLink = linkTo(
-          methodOn(UserController.class).getUserInformation(basicUserInformation.getPublicUserId())).withRel("user");
-
-      final UserRest userInformation = new ModelMapper().map(basicUserInformation, UserRest.class);
-      userInformation.add(userDetailsLink);
-      users.add(userInformation);
-    }
-
+    usersBasicInformation.forEach(userBasicInfo -> {
+      UserRest userRest = new ModelMapper().map(userBasicInfo, UserRest.class);
+      userRest = addLinkTo(userRest);
+      users.add(userRest);
+    });
+    
     return users;
+  }
+
+  private UserRest addLinkTo(final UserRest userBasicInformation) {
+    UserRest userCopy = clone(userBasicInformation);
+    final Link userDetailsLink = buildUserLinkToDetails(userCopy);
+    userCopy.add(userDetailsLink);
+    
+    return userCopy;
+  }
+  
+  private Link buildUserLinkToDetails(UserRest user) {
+    return linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
+  }
+
+  private UserRest clone(UserRest userToCopy) {
+    final ModelMapper mapper = new ModelMapper();
+    final UserRest copiedUser = new UserRest();
+    mapper.map(userToCopy, UserRest.class);
+
+    return copiedUser;
   }
 
   @GetMapping(path = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,
