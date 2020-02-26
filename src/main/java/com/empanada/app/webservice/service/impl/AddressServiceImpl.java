@@ -42,7 +42,7 @@ public class AddressServiceImpl implements AddressService {
       return Collections.emptyList();
     }
 
-    final Iterable<AddressEntity> addresses = addressRepository.findAllByUserDetails(user);
+    final Iterable<AddressEntity> addresses = addressRepository.findAllByUser(user);
     for (final AddressEntity addressEntity : addresses) {
       userAddresses.add(mapper.map(addressEntity, UserAddressDTO.class));
     }

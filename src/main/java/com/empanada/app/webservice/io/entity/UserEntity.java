@@ -9,9 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
-@Entity(name = "users")
+@Entity(name = "user")
 public class UserEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -40,8 +41,9 @@ public class UserEntity implements Serializable {
   @Column(nullable = false)
   private Boolean emailVerficationStatus = false;
 
-  @OneToMany(mappedBy = "userDetails", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+  @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
       CascadeType.REFRESH })
+  @JoinColumn(name="USER_ID")
   private List<AddressEntity> addresses;
 
   public long getId() {

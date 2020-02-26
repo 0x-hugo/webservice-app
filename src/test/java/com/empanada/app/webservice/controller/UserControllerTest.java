@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,11 +20,14 @@ import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
 import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.controller.UserController;
+import com.empanada.app.webservice.ui.model.response.UserRest;
+import com.empanada.app.webservice.ui.utils.MapperBuilder;
 
 public class UserControllerTest {
 
   UserService userService;
   AddressService addressService;
+  MapperBuilder mapperBuilder;
 
   private Page defaultPage;
 
@@ -49,7 +51,7 @@ public class UserControllerTest {
   @SuppressWarnings("serial")
   @Test
   public void getUsersByPaginationTest() {
-    UserController userController = new UserController(this.userService, this.addressService);
+    UserController userController = new UserController(this.userService, this.addressService, this.mapperBuilder);
 
     when(userService.getUsersIndexedByPage(any())).thenReturn(new ArrayList<UserBasicInformationDTO>() {
       {
@@ -58,6 +60,9 @@ public class UserControllerTest {
     });
 
     assertThat(userController.getUsersByPagination(PageMock.getDefaultPagenumber(), PageMock.getDefaultResults()),
-        is(new CollectionModel<>(Collections.emptyList())));
+        is(new CollectionModel<>(new ArrayList<UserRest>()
+            {{
+              add(UserMock.buildDefaultUserRest());
+            }})));
   }
 }

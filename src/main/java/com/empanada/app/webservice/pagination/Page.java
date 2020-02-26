@@ -14,13 +14,6 @@ public class Page {
     this.size = size;
   }
 
-  public static Page build() {
-    return new Page();
-  }
-
-  private Page() {
-  }
-
   public int getNumber() {
     return number;
   }

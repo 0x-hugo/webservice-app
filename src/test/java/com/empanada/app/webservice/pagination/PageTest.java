@@ -22,7 +22,7 @@ public class PageTest {
     int defaultPageNumber = 0;
     int defaultPageResults = 5;
 
-    Page paginationIndex = Page.build();
+    Page paginationIndex = Page.build(defaultPageNumber, defaultPageResults);
 
     assertEquals(defaultPageNumber, paginationIndex.getNumber());
     assertEquals(defaultPageResults, paginationIndex.getSize());
