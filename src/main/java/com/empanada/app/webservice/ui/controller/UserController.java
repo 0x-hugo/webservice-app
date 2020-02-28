@@ -39,7 +39,7 @@ import com.empanada.app.webservice.ui.model.response.UserRest;
 import com.empanada.app.webservice.ui.utils.MapperBuilder;
 
 @RestController
-@RequestMapping("/users") // http://localhost:8080/users
+@RequestMapping(value = "/users", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }) // http://localhost:8080/users
 public class UserController {
 
   UserService userService;
@@ -56,11 +56,10 @@ public class UserController {
     this.mapper = mapperBuilder.getMapper();
   }
 
-  @GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+  @GetMapping(produces = "application/hal+json" )
   public CollectionModel<UserRest> getUsersByPagination(
-      //TODO: extract this params default values to its own domain
-      @RequestParam(value = "page", defaultValue = "0") int pageNumber,
-      @RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
+    @RequestParam(value = "page", defaultValue = "0") int pageNumber,
+    @RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
     final List<UserRest> usersDetails = getUsersDetailsByPagination(pageNumber, resultsLimit);
     return new CollectionModel<>(usersDetails);
   }
@@ -91,8 +90,7 @@ public class UserController {
     return linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
   }
 
-  @GetMapping(path = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,
-      "application/hal+json" })
+  @GetMapping(path = "/{id}", produces = "application/hal+json")
   public EntityModel<UserRest> getUserInformation(@PathVariable String id) throws UserServiceException {
     final UserRest userInfo = getUserDetails(id);
     return new EntityModel<>(userInfo);
@@ -130,16 +128,16 @@ public class UserController {
     return mapper.map(createdUser, UserRest.class);
   }
 
-  @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
-          MediaType.APPLICATION_JSON_VALUE })
+  @PutMapping(path = "/{id}", 
+              consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
+              produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
     final UserBasicInformationDTO userDto = mapper.map(userDetails, UserBasicInformationDTO.class);
     final UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
     return mapper.map(updateUser, UserRest.class);
   }
 
-  @DeleteMapping(path = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @DeleteMapping(path = "/{id}")
   public OperationStatus deleteUser(@PathVariable String id) {
     final OperationStatus operationStatus = new OperationStatus();
     operationStatus.setName(OperationStatusName.DELETE.name());
@@ -154,8 +152,7 @@ public class UserController {
     return operationStatus;
   }
 
-  @GetMapping(path = "/{id}/addresses", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,
-      "application/hal+json" })
+  @GetMapping(path = "/{id}/addresses", produces = "application/hal+json")
   public CollectionModel<AddressRest> getUserAddresses(@PathVariable String id) throws UserServiceException {
     final List<UserAddressDTO> addressesInfo = addressService.getAddresses(id);
     List<AddressRest> addresses = mapAddresses(addressesInfo);
@@ -184,8 +181,7 @@ public class UserController {
     return addressesCopy;
   }
 
-  @GetMapping(path = "/{userId}/addresses/{addressId}", produces = { MediaType.APPLICATION_XML_VALUE,
-      MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+  @GetMapping(path = "/{userId}/addresses/{addressId}", produces = "application/hal+json")
   public EntityModel<AddressRest> getAddressInformation(@PathVariable String userId, @PathVariable String addressId) {
     final UserAddressDTO addressDto = addressService.getAddressById(addressId);
     AddressRest addressResponse = mapper.map(addressDto, AddressRest.class);
@@ -214,8 +210,7 @@ public class UserController {
   /*
    * http://localhost:8080/spring-ws-app/users/email-verification?token=jkld1kl3
    */
-  @GetMapping(path = "/email-verification", produces = { MediaType.APPLICATION_JSON_VALUE,
-      MediaType.APPLICATION_XML_VALUE })
+  @GetMapping(path = "/email-verification")
   public OperationStatus verifyEmailToken(@RequestParam(value = "token") String token) {
     final OperationStatus operationStatus = new OperationStatus();
     operationStatus.setName(OperationStatusName.VERIFY_EMAIL.name());
