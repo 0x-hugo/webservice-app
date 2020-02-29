@@ -39,7 +39,7 @@ import com.empanada.app.webservice.ui.model.response.UserRest;
 import com.empanada.app.webservice.ui.utils.MapperBuilder;
 
 @RestController
-@RequestMapping(value = "/users", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }) // http://localhost:8080/users
+@RequestMapping(value = "/users", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 public class UserController {
 
   UserService userService;
@@ -47,7 +47,7 @@ public class UserController {
   MapperBuilder mapperBuilder;
 
   ModelMapper mapper;
-  
+
   @Autowired
   public UserController(UserService userService, AddressService addressService, MapperBuilder mapperBuilder) {
     this.userService = userService;
@@ -56,10 +56,10 @@ public class UserController {
     this.mapper = mapperBuilder.getMapper();
   }
 
-  @GetMapping(produces = "application/hal+json" )
+  @GetMapping(produces = "application/hal+json")
   public CollectionModel<UserRest> getUsersByPagination(
-    @RequestParam(value = "page", defaultValue = "0") int pageNumber,
-    @RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
+      @RequestParam(value = "page", defaultValue = "0") int pageNumber,
+      @RequestParam(value = "limit", defaultValue = "5") int resultsLimit) {
     final List<UserRest> usersDetails = getUsersDetailsByPagination(pageNumber, resultsLimit);
     return new CollectionModel<>(usersDetails);
   }
@@ -73,11 +73,11 @@ public class UserController {
   private List<UserRest> buildLinkWithDetails(List<UserBasicInformationDTO> usersBasicInformation) {
     final List<UserRest> users = new ArrayList<>();
     usersBasicInformation.forEach(userBasicInfo -> {
-      UserRest userRest = mapper.map(userBasicInfo, UserRest.class);
+      final UserRest userRest = mapper.map(userBasicInfo, UserRest.class);
       addDetailsLinkTo(userRest);
       users.add(userRest);
     });
-    
+
     return users;
   }
 
@@ -85,7 +85,7 @@ public class UserController {
     final Link userDetailsLink = buildLinkToDetails(userInfo);
     userInfo.add(userDetailsLink);
   }
-  
+
   private Link buildLinkToDetails(UserRest user) {
     return linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
   }
@@ -115,22 +115,18 @@ public class UserController {
   }
 
   private Link buildLinkToAddress(UserRest userInfo, final AddressRest address) {
-    return linkTo(
-        methodOn(UserController.class).getAddressInformation(userInfo.getUserId(), address.getAddressId()))
+    return linkTo(methodOn(UserController.class).getAddressInformation(userInfo.getUserId(), address.getAddressId()))
         .withRel("address");
   }
 
-  @PostMapping( consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
-                produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
     final UserBasicInformationDTO userDto = mapper.map(userDetails, UserBasicInformationDTO.class);
     final UserBasicInformationDTO createdUser = userService.createUser(userDto);
     return mapper.map(createdUser, UserRest.class);
   }
 
-  @PutMapping(path = "/{id}", 
-              consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
-              produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
   public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
     final UserBasicInformationDTO userDto = mapper.map(userDetails, UserBasicInformationDTO.class);
     final UserBasicInformationDTO updateUser = userService.updateUser(id, userDto);
@@ -218,7 +214,7 @@ public class UserController {
     try {
       userService.verifyEmailToken(token);
       operationStatus.setResult(OperationStatusResult.SUCCESS.name());
-    } catch (UserServiceException e) {
+    } catch (final UserServiceException e) {
       operationStatus.setResult(OperationStatusResult.ERROR.name());
     }
 
