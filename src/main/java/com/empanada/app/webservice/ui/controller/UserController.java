@@ -1,8 +1,5 @@
 package com.empanada.app.webservice.ui.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +33,7 @@ import com.empanada.app.webservice.ui.model.response.OperationStatus;
 import com.empanada.app.webservice.ui.model.response.OperationStatusName;
 import com.empanada.app.webservice.ui.model.response.OperationStatusResult;
 import com.empanada.app.webservice.ui.model.response.UserRest;
+import com.empanada.app.webservice.ui.utils.LinkProvider;
 import com.empanada.app.webservice.ui.utils.MapperBuilder;
 
 @RestController
@@ -73,21 +71,17 @@ public class UserController {
   private List<UserRest> buildLinkWithDetails(List<UserBasicInformationDTO> usersBasicInformation) {
     final List<UserRest> users = new ArrayList<>();
     usersBasicInformation.forEach(userBasicInfo -> {
-      final UserRest userRest = mapper.map(userBasicInfo, UserRest.class);
-      addDetailsLinkTo(userRest);
-      users.add(userRest);
+      final UserRest user = mapper.map(userBasicInfo, UserRest.class);
+      addLinkToUser(user);
+      users.add(user);
     });
 
     return users;
   }
 
-  private void addDetailsLinkTo(final UserRest userInfo) {
-    final Link userDetailsLink = buildLinkToDetails(userInfo);
-    userInfo.add(userDetailsLink);
-  }
-
-  private Link buildLinkToDetails(UserRest user) {
-    return linkTo(methodOn(UserController.class).getUserInformation(user.getUserId())).withRel("user");
+  private void addLinkToUser(final UserRest user) {
+    final Link userDetails = LinkProvider.userInformation(user.getUserId(), "user");
+    user.add(userDetails);
   }
 
   @GetMapping(path = "/{id}", produces = "application/hal+json")
@@ -109,14 +103,9 @@ public class UserController {
 
   private void linkAddressesToUser(UserRest userInfo) {
     userInfo.getAddresses().forEach(address -> {
-      final Link addressLink = buildLinkToAddress(userInfo, address);
+      final Link addressLink = LinkProvider.addressInformation(userInfo.getUserId(), address.getAddressId(), "address");
       address.add(addressLink);
     });
-  }
-
-  private Link buildLinkToAddress(UserRest userInfo, final AddressRest address) {
-    return linkTo(methodOn(UserController.class).getAddressInformation(userInfo.getUserId(), address.getAddressId()))
-        .withRel("address");
   }
 
   @PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
@@ -166,11 +155,10 @@ public class UserController {
   private List<AddressRest> addLinksToAddresses(String id, List<AddressRest> addresses) {
     final List<AddressRest> addressesCopy = new ArrayList<>(addresses);
     for (final AddressRest address : addressesCopy) {
-      final Link addressLink = linkTo(methodOn(UserController.class).getAddressInformation(id, address.getAddressId()))
-          .withRel("address");
+      final Link addressLink = LinkProvider.addressInformation(id, address.getAddressId(), "address");
       address.add(addressLink);
 
-      final Link userLink = linkTo(methodOn(UserController.class).getUserInformation(id)).withRel("user");
+      final Link userLink = LinkProvider.userInformation(id, "user");
       address.add(userLink);
     }
 
@@ -188,9 +176,9 @@ public class UserController {
   private AddressRest addDetailsToAddress(final AddressRest address, String userId, String addressId) {
     final AddressRest addressResponse = clone(address);
 
-    final Link linkSelf = linkTo(methodOn(UserController.class).getAddressInformation(userId, addressId)).withSelfRel();
-    final Link linkUser = linkTo(UserController.class).slash(userId).withRel("user");
-    final Link linkAddresses = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
+    final Link linkSelf = LinkProvider.selfAddress(addressId, userId);
+    final Link linkUser = LinkProvider.selfUser(userId);
+    final Link linkAddresses = LinkProvider.userAddresses(userId, "addresses");
 
     addressResponse.add(linkSelf);
     addressResponse.add(linkUser);

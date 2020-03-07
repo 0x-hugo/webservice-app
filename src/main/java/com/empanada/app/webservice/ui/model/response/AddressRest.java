@@ -2,6 +2,8 @@ package com.empanada.app.webservice.ui.model.response;
 
 import org.springframework.hateoas.RepresentationModel;
 
+import com.empanada.app.webservice.ui.utils.LinkProvider;
+
 public class AddressRest extends RepresentationModel<AddressRest> {
 
   private String addressId;
@@ -9,6 +11,12 @@ public class AddressRest extends RepresentationModel<AddressRest> {
   private String country;
   private String streetName;
   private String postalCode;
+
+  LinkProvider linkProvider;
+
+  public AddressRest(LinkProvider linkProvider) {
+    this.linkProvider = linkProvider;
+  }
 
   public String getCity() {
     return city;
