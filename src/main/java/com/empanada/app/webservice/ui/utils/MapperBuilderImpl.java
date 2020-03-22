@@ -8,15 +8,10 @@ import org.springframework.stereotype.Component;
 public class MapperBuilderImpl implements MapperBuilder{
 
   private ModelMapper mapper;
-  
+
   @Autowired
   public MapperBuilderImpl( ModelMapper mapperImpl) {
     mapper = mapperImpl;
-  }
-  
-  public ModelMapper buildDefaultMapper() {
-    mapper = new ModelMapper();
-    return mapper;
   }
 
   @Override
@@ -24,6 +19,11 @@ public class MapperBuilderImpl implements MapperBuilder{
     if (mapper == null) {
       buildDefaultMapper();
     }
+    return mapper;
+  }
+
+  public ModelMapper buildDefaultMapper() {
+    mapper = new ModelMapper();
     return mapper;
   }
 }

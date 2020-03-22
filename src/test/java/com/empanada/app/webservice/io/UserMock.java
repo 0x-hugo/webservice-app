@@ -15,8 +15,8 @@ public class UserMock {
     return new UserBasicInformationDTO();
   }
 
-  private void getUserId() {
-
-  }
+   public static UserRest mappedUserRest() {
+     return new UserRest();
+   }
 
 }

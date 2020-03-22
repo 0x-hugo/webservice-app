@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.CollectionModel;
 
 import com.empanada.app.webservice.io.UserMock;
-import com.empanada.app.webservice.pagination.Page;
 import com.empanada.app.webservice.pagination.PageMock;
 import com.empanada.app.webservice.service.AddressService;
 import com.empanada.app.webservice.service.UserService;
@@ -22,6 +22,7 @@ import com.empanada.app.webservice.shared.dto.UserBasicInformationDTO;
 import com.empanada.app.webservice.ui.controller.UserController;
 import com.empanada.app.webservice.ui.model.response.UserRest;
 import com.empanada.app.webservice.ui.utils.MapperBuilder;
+import com.empanada.app.webservice.ui.utils.MapperBuilderImpl;
 
 public class UserControllerTest {
 
@@ -29,18 +30,13 @@ public class UserControllerTest {
   AddressService addressService;
   MapperBuilder mapperBuilder;
 
-  private Page defaultPage;
-
   @BeforeEach
   private void setup() {
     userService = mock(UserService.class);
     addressService = mock(AddressService.class);
+    mapperBuilder = new MapperBuilderImpl(new ModelMapper());
     MockitoAnnotations.initMocks(this);
-    mockPage();
-  }
 
-  private void mockPage() {
-    defaultPage = PageMock.buildDefaultPage();
   }
 
   @Test

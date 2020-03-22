@@ -29,32 +29,35 @@ import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 @Service
 public class UserServiceImpl implements UserService {
 
-  @Autowired
   UserRepository userRepository;
+  AddressService addressService;
 
-  @Autowired
   SecurityUtils utils;
-
-  @Autowired
   BCryptPasswordEncoder bCryptPasswordEncoder;
 
   @Autowired
-  AddressService addressService;
+  public UserServiceImpl(UserRepository userRepositoryImpl, AddressService addressServiceImpl,
+      SecurityUtils utilsInstance, BCryptPasswordEncoder bCryptPasswordEncoderInstance) {
+    userRepository = userRepositoryImpl;
+    addressService = addressServiceImpl;
+    utils = utilsInstance;
+    bCryptPasswordEncoder = bCryptPasswordEncoderInstance;
+  }
 
   @Override
   public UserBasicInformationDTO createUser(UserBasicInformationDTO user) throws UserServiceException {
     if (userRepository.findByEmail(user.getEmail()) != null)
       throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 
-    ModelMapper mapper = new ModelMapper();
-    UserEntity userEntity = generateModelToSave(user);
+    final ModelMapper mapper = new ModelMapper();
+    final UserEntity userEntity = generateModelToSave(user);
     userRepository.save(userEntity);
 //    new AmazonSES().verifyEmail(mapper.map(userEntity, UserBasicInformationDTO.class));
-    return mapper.map(userEntity,UserBasicInformationDTO.class);
+    return mapper.map(userEntity, UserBasicInformationDTO.class);
   }
 
   private UserEntity generateModelToSave(final UserBasicInformationDTO userOrig) {
-    UserBasicInformationDTO user = cloneUser(userOrig);
+    final UserBasicInformationDTO user = cloneUser(userOrig);
     generateUserInfo(user);
     return buildUserEntity(user);
   }
@@ -71,9 +74,9 @@ public class UserServiceImpl implements UserService {
     user.setEncryptedPassword(encriptPassword(user.getPassword()));
     generateAddressesId(user.getAddresses());
   }
-  
+
   private UserEntity buildUserEntity(UserBasicInformationDTO userCopy) {
-    UserEntity userTest =new ModelMapper().map(userCopy, UserEntity.class);
+    final UserEntity userTest = new ModelMapper().map(userCopy, UserEntity.class);
     linkAddressEntity(userTest);
     return userTest;
   }
@@ -82,13 +85,12 @@ public class UserServiceImpl implements UserService {
     userTest.getAddresses().forEach(address -> address.setUser(userTest));
   }
 
-  private String encriptPassword (String password) {
+  private String encriptPassword(String password) {
     return bCryptPasswordEncoder.encode(password);
   }
 
   private void generateAddressesId(List<UserAddressDTO> addresses) {
-    addresses.forEach( address -> 
-    address.setAddressId(utils.generateAddressId(SecurityUtils.DEFAULT_LENGTH)));
+    addresses.forEach(address -> address.setAddressId(utils.generateAddressId(SecurityUtils.DEFAULT_LENGTH)));
   }
 
   @Override
@@ -98,7 +100,6 @@ public class UserServiceImpl implements UserService {
     if (userLoginDetails == null)
       throw new UserNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 
-    // User is a Spring Security BEAN
     return new User(userLoginDetails.getEmail(), userLoginDetails.getEncryptedPassword(),
         userLoginDetails.getEmailVerficationStatus(), true, true, true, new ArrayList<>());
   }
@@ -175,19 +176,19 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void verifyEmailToken(String token) throws UserServiceException {
-    try{
+    try {
       final UserEntity userEntity = findUserByVerificationToken(token);
       if (!SecurityUtils.hasTokenExpired(token))
         saveEmailVerification(userEntity);
-    } catch (UserNotFoundException e) {
-      throw new UserServiceException("Could not verify user with token ["+token+"]");
+    } catch (final UserNotFoundException e) {
+      throw new UserServiceException("Could not verify user with token [" + token + "]");
     }
   }
 
   private UserEntity findUserByVerificationToken(String token) throws UserNotFoundException {
     final UserEntity userEntity = userRepository.findByEmailVerificationToken(token);
     if (userEntity == null)
-      throw new UserNotFoundException("No user with token ["+token+"]");
+      throw new UserNotFoundException("No user with token [" + token + "]");
     return userEntity;
   }
 
