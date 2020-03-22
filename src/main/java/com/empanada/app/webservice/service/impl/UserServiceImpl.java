@@ -29,17 +29,20 @@ import com.empanada.app.webservice.ui.model.response.ErrorMessages;
 @Service
 public class UserServiceImpl implements UserService {
 
-  @Autowired
   UserRepository userRepository;
+  AddressService addressService;
 
-  @Autowired
   SecurityUtils utils;
-
-  @Autowired
   BCryptPasswordEncoder bCryptPasswordEncoder;
 
   @Autowired
-  AddressService addressService;
+  public UserServiceImpl(UserRepository userRepositoryImpl, AddressService addressServiceImpl,
+      SecurityUtils utilsInstance, BCryptPasswordEncoder bCryptPasswordEncoderInstance) {
+    userRepository = userRepositoryImpl;
+    addressService = addressServiceImpl;
+    utils = utilsInstance;
+    bCryptPasswordEncoder = bCryptPasswordEncoderInstance;
+  }
 
   @Override
   public UserBasicInformationDTO createUser(UserBasicInformationDTO user) throws UserServiceException {
