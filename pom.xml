@@ -18,7 +18,7 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<spring-boot-framework.version>2.2.4.RELEASE</spring-boot-framework.version>
+		<spring-boot-framework.version>2.5.12</spring-boot-framework.version>
 		<jackson.version>2.10.2</jackson.version>
 		<mysql-jdbc.version>8.0.19</mysql-jdbc.version>
 		<jsonwebtoken.version>0.6.0</jsonwebtoken.version>
