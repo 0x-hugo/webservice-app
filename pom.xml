@@ -20,7 +20,7 @@
 		<java.version>1.8</java.version>
 		<spring-boot-framework.version>2.5.12</spring-boot-framework.version>
 		<jackson.version>2.10.2</jackson.version>
-		<mysql-jdbc.version>8.0.19</mysql-jdbc.version>
+		<mysql-jdbc.version>8.0.28</mysql-jdbc.version>
 		<jsonwebtoken.version>0.6.0</jsonwebtoken.version>
 		<aws-sdk-ses.version>1.11.560</aws-sdk-ses.version>
 		<modelmapper.version>2.3.0</modelmapper.version>
